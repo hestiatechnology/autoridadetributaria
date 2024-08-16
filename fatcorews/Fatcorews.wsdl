@@ -784,6 +784,7 @@
             </complexType>
         </schema>
     </wsdl:types>
+    <!--Mensagens-->
     <wsdl:message name="RegisterInvoiceRequest">
         <wsdl:part element="tns:RegisterInvoiceRequest" name="RegisterInvoiceRequest"/>
     </wsdl:message>
