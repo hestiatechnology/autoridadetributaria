@@ -5,6 +5,8 @@ import (
 	"log"
 	"regexp"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 // Campo para indicacao da mais recente versao do SAF-T
@@ -520,6 +522,56 @@ type SourceDocumentID struct {
 	InvoiceDate   InvoiceDate   `xml:"InvoiceDate"`
 }
 
+type OrderReferences struct {
+	XMLName       xml.Name      `xml:"OrderReferences"`
+	OriginatingON OriginatingON `xml:"OriginatingON"`
+	OrderDate     time.Time     `xml:"OrderDate"`
+}
+
+type MonetaryType decimal.Decimal
+
+// If value is negative or greater than 9999999999999.99 returns -1.
+// AT: Elemento do SAF-T alterado, com a inclusão do valor
+// máximo permitido.
+func NewMonetaryType(value decimal.Decimal) MonetaryType {
+	if value.IsNegative() || value.GreaterThan(decimal.NewFromFloat(9999999999999.99)) {
+		return MonetaryType(decimal.NewFromFloat(float64(-1)))
+	}
+	return MonetaryType(value)
+}
+
+// Either "IVA" or "IS" or "NS"
+type TaxType string
+
+const (
+	TaxIVA TaxType = "IVA"
+	TaxIS  TaxType = "IS"
+	TaxNS  TaxType = "NS"
+)
+
+func NewTaxType(value string) TaxType {
+	switch value {
+	case "IVA":
+		return TaxIVA
+	case "IS":
+		return TaxIS
+	case "NS":
+		return TaxNS
+	default:
+		return ""
+	}
+}
+
+// ISO 3166-1 alpha-2 country code
+type TaxCountryRegion string
+
+func NewTaxCountryRegion(value string) TaxCountryRegion {
+	r := regexp.MustCompile(`[A-Z]{2}`)
+	if !r.MatchString(value) || (value != "PT-MA" && value != "PT-AC") {
+		return ""
+	}
+	return TaxCountryRegion(value)
+}
 func main() {
 	nif := NewSAFPTPortugueseVatNumber(251487547)
 	log.Println(nif)
