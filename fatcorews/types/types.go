@@ -274,13 +274,13 @@ func NewHashCharaters(value string) HashCharaters {
 
 type InvoiceTypeType string
 
-/* Restricao: Tipos de Documento fatura (FT - Fatura,
-NC-Nota de Credito,
+/* Restricao: Tipos de Documento fatura (
+FT - Fatura,
+NC - Nota de Credito,
 ND - Nota de Debito,
 FS - Fatura Simplificada,
 FR - Fatura-recibo).
-Para o setor Segurador (a), ainda pode ser
-preenchido com:
+Para o setor Segurador (a), ainda pode ser preenchido com:
 RP para Premio ou recibo de premio,
 RE para Estorno ou recibo de estorno,
 CS para Imputacao a co-seguradoras,
@@ -584,9 +584,4 @@ func NewTaxCountryRegion(value string) TaxCountryRegion {
 	}
 
 	return ""
-}
-
-func main() {
-	nif := NewSAFPTPortugueseVatNumber(251487547)
-	log.Println(nif)
 }
