@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/hestiatechnology/autoridadetributaria/common"
 	"github.com/shopspring/decimal"
 )
 
@@ -506,11 +507,15 @@ func NewPaperLessIndicator(value uint) PaperLessIndicator {
 type TaxIDCountry string
 
 func NewTaxIDCountry(value string) TaxIDCountry {
-	r := regexp.MustCompile(`[A-Z]{2}`)
-	if !r.MatchString(value) || value != "Desconhecido" {
-		return ""
+	if value == "Desconhecido" {
+		return TaxIDCountry(value)
 	}
-	return TaxIDCountry(value)
+	for _, country := range common.CountryCodes {
+		if value == country {
+			return TaxIDCountry(value)
+		}
+	}
+	return ""
 }
 
 type OriginatingON SAFPTtextTypeMandatoryMax60Car
@@ -566,12 +571,21 @@ func NewTaxType(value string) TaxType {
 type TaxCountryRegion string
 
 func NewTaxCountryRegion(value string) TaxCountryRegion {
-	r := regexp.MustCompile(`[A-Z]{2}`)
-	if !r.MatchString(value) || (value != "PT-MA" && value != "PT-AC") {
-		return ""
+	if value == "PT-MA" || value == "PT-AC" {
+		return TaxCountryRegion(value)
 	}
-	return TaxCountryRegion(value)
+
+	// Avoid using the regex provided by AT
+	// Regex is 600% slower than this way
+	for _, country := range common.CountryCodes {
+		if value == country {
+			return TaxCountryRegion(value)
+		}
+	}
+
+	return ""
 }
+
 func main() {
 	nif := NewSAFPTPortugueseVatNumber(251487547)
 	log.Println(nif)
