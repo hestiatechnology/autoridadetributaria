@@ -30,3 +30,10 @@ var CountryCodes = []string{
 	"UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN",
 	"VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW",
 }
+
+var VatExemptionCodes = []string{
+	"M01", "M02", "M04", "M05", "M06", "M07", "M09", "M10",
+	"M11", "M12", "M13", "M14", "M15", "M16", "M19", "M20",
+	"M21", "M25", "M26", "M30", "M31", "M32", "M33", "M34",
+	"M40", "M41", "M42", "M43",
+}

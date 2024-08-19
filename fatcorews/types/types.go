@@ -585,3 +585,102 @@ func NewTaxCountryRegion(value string) TaxCountryRegion {
 
 	return ""
 }
+
+type TaxCode string
+
+const (
+	TaxCodeReduced    TaxCode = "RED"
+	TaxCodeInterm     TaxCode = "INT"
+	TaxCodeNormal     TaxCode = "NOR"
+	TaxCodeExempt     TaxCode = "ISE"
+	TaxCodeOther      TaxCode = "OUT"
+	TaxCodeNotSubject TaxCode = "NS"
+	// ??? Unsure about this one, it's one the WSDL but on the
+	// pdf documentation it's not present
+	TaxCodeNA TaxCode = "NA"
+)
+
+// Returns the TaxCode based on the value
+func NewTaxCode(value string) TaxCode {
+	if len(value) > 10 || len(value) < 1 {
+		return ""
+	}
+	if value == "RED" {
+		return TaxCodeReduced
+	} else if value == "INT" {
+		return TaxCodeInterm
+	} else if value == "NOR" {
+		return TaxCodeNormal
+	} else if value == "ISE" {
+		return TaxCodeExempt
+	} else if value == "OUT" {
+		return TaxCodeOther
+	} else if value == "NS" {
+		return TaxCodeNotSubject
+	} else if value == "NA" {
+		return TaxCodeNA
+	} else {
+		r := regexp.MustCompile(`([a-zA-Z0-9.])*`)
+		if r.MatchString(value) {
+			return TaxCode(value)
+		}
+	}
+	return ""
+}
+
+type PercentageType decimal.Decimal
+
+// If value is negative or greater than 100 returns -1.
+func NewPercentageType(value decimal.Decimal) PercentageType {
+	if value.IsNegative() || value.GreaterThan(decimal.NewFromInt(100)) {
+		return PercentageType(decimal.NewFromFloat(float64(-1)))
+	}
+	return PercentageType(value)
+}
+
+// Code is of type M[0-9]{2}
+type TaxExemptionCode string
+
+func NewTaxExemptionCode(value string) TaxExemptionCode {
+	for _, code := range common.VatExemptionCodes {
+		if value == code {
+			return TaxExemptionCode(value)
+		}
+	}
+	return ""
+}
+
+type DocumentTotals struct {
+	XMLName    xml.Name     `xml:"DocumentTotals"`
+	TaxPayable MonetaryType `xml:"TaxPayable"`
+	NetTotal   MonetaryType `xml:"NetTotal"`
+	GrossTotal MonetaryType `xml:"GrossTotal"`
+}
+
+type WithholdingTaxType string
+
+const (
+	WithholdingTaxIRS WithholdingTaxType = "IRS"
+	WithholdingTaxIRC WithholdingTaxType = "IRC"
+	WithholdingTaxIS  WithholdingTaxType = "IS"
+)
+
+func NewWithholdingTaxType(value string) WithholdingTaxType {
+	switch value {
+	case "IRS":
+		return WithholdingTaxIRS
+	case "IRC":
+		return WithholdingTaxIRC
+	case "IS":
+		return WithholdingTaxIS
+	default:
+		return ""
+	}
+}
+
+type WithholdingTax struct {
+	XMLName xml.Name `xml:"WithholdingTax"`
+	// optional
+	WithholdingTaxType   WithholdingTaxType `xml:"WithholdingTax"`
+	WithholdingTaxAmount MonetaryType       `xml:"WithholdingTaxAmount"`
+}
