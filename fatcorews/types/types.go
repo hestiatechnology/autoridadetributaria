@@ -684,3 +684,94 @@ type WithholdingTax struct {
 	WithholdingTaxType   WithholdingTaxType `xml:"WithholdingTax"`
 	WithholdingTaxAmount MonetaryType       `xml:"WithholdingTaxAmount"`
 }
+
+type DateRangeType struct {
+	XMLName   xml.Name  `xml:"DateRangeType"`
+	StartDate time.Time `xml:"StartDate"`
+	EndDate   time.Time `xml:"EndDate"`
+}
+
+type InvoiceType InvoiceTypeType
+type ATCUD SAFPTtextTypeMandatoryMax100Car
+type CustomerTaxID SAFPTtextTypeMandatoryMax30Car
+type CustomerTaxIDCountry TaxIDCountry
+type WorkDate time.Time
+type WorkType WorkTypeType
+
+type InvoiceHeaderType struct {
+	XMLName              xml.Name             `xml:"InvoiceHeaderType"`
+	InvoiceNo            InvoiceNo            `xml:"InvoiceNo"`
+	InvoiceDate          InvoiceDate          `xml:"InvoiceDate"`
+	InvoiceType          InvoiceType          `xml:"InvoiceType"`
+	SelfBillingIndicator SelfBillingIndicator `xml:"SelfBillingIndicator"`
+	CustomerTaxID        CustomerTaxID        `xml:"CustomerTaxID"`
+	CustomerTaxIDCountry CustomerTaxIDCountry `xml:"CustomerTaxIDCountry"`
+}
+
+type ListInvoicesDocumentsType struct {
+	XMLName xml.Name `xml:"ListInvoicesDocumentsType"`
+	//mandatory at least one
+	Invoice []InvoiceHeaderType `xml:"invoice"`
+}
+
+type WorkHeaderType struct {
+	XMLName              xml.Name             `xml:"WorkHeaderType"`
+	DocumentNumber       DocumentNumber       `xml:"DocumentNumber"`
+	ATCUD                ATCUD                `xml:"ATCUD"`
+	WorkDate             WorkDate             `xml:"WorkDate"`
+	WorkType             WorkType             `xml:"WorkType"`
+	CustomerTaxID        CustomerTaxID        `xml:"CustomerTaxID"`
+	CustomerTaxIDCountry CustomerTaxIDCountry `xml:"CustomerTaxIDCountry"`
+}
+
+type ListWorkDocumentsType struct {
+	XMLName xml.Name `xml:"ListWorkDocumentsType"`
+	//mandatory at least one
+	Work []WorkHeaderType `xml:"work"`
+}
+
+type TransactionDate time.Time
+type PaymentType PaymentTypeType
+
+type PaymentHeaderType struct {
+	XMLName              xml.Name             `xml:"PaymentHeaderType"`
+	PaymentRefNo         PaymentRefNo         `xml:"PaymentRefNo"`
+	ATCUD                ATCUD                `xml:"ATCUD"`
+	TransactionDate      TransactionDate      `xml:"TransactionDate"`
+	PaymentType          PaymentType          `xml:"PaymentType"`
+	CustomerTaxID        CustomerTaxID        `xml:"CustomerTaxID"`
+	CustomerTaxIDCountry CustomerTaxIDCountry `xml:"CustomerTaxIDCountry"`
+}
+
+type ListPaymentDocumentsType struct {
+	XMLName xml.Name `xml:"ListPaymentDocumentsType"`
+	//mandatory at least one
+	Payment []PaymentHeaderType `xml:"payment"`
+}
+
+type CodigoResposta uint
+type Mensagem string
+
+func NewMensagem(value string) Mensagem {
+	if len(value) > 256 {
+		return ""
+	}
+	return Mensagem(value)
+}
+
+type DataOperacao time.Time
+
+type ResponseType struct {
+	XMLName        xml.Name       `xml:"ResponseType"`
+	CodigoResposta CodigoResposta `xml:"CodigoResposta"`
+	Mensagem       Mensagem       `xml:"Mensagem"`
+	DataOperacao   DataOperacao   `xml:"DataOperacao"`
+}
+
+type ChannelType struct {
+	XMLName xml.Name `xml:"ChannelType"`
+	// mandatory
+	Sistema string `xml:"Sistema"`
+	// optional
+	Versao string `xml:"Versao"`
+}
