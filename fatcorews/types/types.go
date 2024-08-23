@@ -545,6 +545,15 @@ func NewMonetaryType(value decimal.Decimal) MonetaryType {
 	return MonetaryType(value)
 }
 
+type Tax struct {
+	XMLName          xml.Name         `xml:"Tax"`
+	TaxType          TaxType          `xml:"TaxType"`
+	TaxCountryRegion TaxCountryRegion `xml:"TaxCountryRegion"`
+	TaxCode          TaxCode          `xml:"TaxCode"`
+	TaxPercentage    *PercentageType  `xml:"TaxPercentage"`
+	TotalTaxAmount   *MonetaryType    `xml:"TaxAmount"`
+}
+
 // Either "IVA" or "IS" or "NS"
 type TaxType string
 
@@ -810,12 +819,28 @@ type InvoiceDataType struct {
 	HashCharaters          HashCharaters          `xml:"HashCharaters"`
 	CashVATSchemeIndicator CashVATSchemeIndicator `xml:"CashVATSchemeIndicator"`
 	PaperLessIndicator     PaperLessIndicator     `xml:"PaperLessIndicator"`
-	EACCode                EACCode                `xml:"EACCode"` // optional
+	EACCode                *EACCode               `xml:"EACCode"` // optional
 	SystemEntryDate        time.Time              `xml:"SystemEntryDate"`
+	LineSummary            []LineSummary          `xml:"LineSummary"`
+	DocumentTotals         DocumentTotals         `xml:"DocumentTotals"`
+	WithholdingTax         []WithholdingTax       `xml:"WithholdingTax"` // optional
+}
+
+type TaxPointDate time.Time
+type Reference SAFPTtextTypeMandatoryMax60Car
+
+type LineSummary struct {
+	OrderReferences      *OrderReferences     `xml:"OrderReferences"` // optional
+	TaxPointDate         TaxPointDate         `xml:"TaxPointDate"`
+	Reference            *Reference           `xml:"Reference"` // optional
+	DebitCreditIndicator DebitCreditIndicator `xml:"DebitCreditIndicator"`
+	TotalTaxBase         *MonetaryType        `xml:"TotalTaxBase"`
+	Amount               *MonetaryType        `xml:"Amount"`
+	Tax                  Tax                  `xml:"Tax"`
+	TaxExemptionCode     *TaxExemptionCode    `xml:"TaxExemptionCode"` // optional
 }
 
 // Requests
-
 type RegisterInvoiceRequest struct {
 	XMLName                   xml.Name              `xml:"RegisterInvoiceRequest"`
 	EFaturaMDVersion          EFaturaMDVersion      `xml:"eFaturaMDVersion"`
@@ -833,7 +858,7 @@ var a = RegisterInvoiceRequest{
 	InvoiceData: InvoiceDataType{
 		InvoiceHeaderType: InvoiceHeaderType{
 			InvoiceNo:            NewInvoiceNo("FT A/1"),
-			InvoiceDate:          time.Now(),
+			InvoiceDate:          InvoiceDate(time.Now()),
 			InvoiceType:          InvoiceType(InvoiceFT),
 			SelfBillingIndicator: SelfBillingNo,
 			CustomerTaxID:        NewCustomerTaxID("999999999"),
@@ -845,6 +870,16 @@ var a = RegisterInvoiceRequest{
 		},
 		HashCharaters:          NewHashCharaters("1234"),
 		CashVATSchemeIndicator: CashVATSchemeNo,
+		WithholdingTax: []WithholdingTax{
+			{
+				WithholdingTaxType:   WithholdingTaxIRC,
+				WithholdingTaxAmount: NewMonetaryType(decimal.NewFromFloat(10.0)),
+			},
+			{
+				WithholdingTaxType:   WithholdingTaxIRC,
+				WithholdingTaxAmount: NewMonetaryType(decimal.NewFromFloat(20.0)),
+			},
+		},
 	},
 }
 
