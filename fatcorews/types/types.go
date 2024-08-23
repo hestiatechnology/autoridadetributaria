@@ -775,3 +775,39 @@ type ChannelType struct {
 	// optional
 	Versao string `xml:"Versao"`
 }
+
+type EFaturaMDVersion string
+
+func NewEFaturaMDVersion() EFaturaMDVersion {
+	return EFaturaMDVersion("0.0.1")
+}
+
+type TaxRegistrationNumber SAFPTPortugueseVatNumber
+
+func NewTaxRegistrationNumber(value uint) TaxRegistrationNumber {
+	return TaxRegistrationNumber(NewSAFPTPortugueseVatNumber(value))
+}
+
+type TaxEntity SAFPTtextTypeMandatoryMax20Car
+
+func NewTaxEntity(value string) TaxEntity {
+	return TaxEntity(NewSAFPTtextTypeMandatoryMax20Car(value))
+}
+
+type InvoiceDataType struct {
+	InvoiceHeaderType
+	DocumentStatus         InvoiceStatus          `xml:"DocumentStatus"`
+	HashCharaters          HashCharaters          `xml:"HashCharaters"`
+	CashVATSchemeIndicator CashVATSchemeIndicator `xml:"CashVATSchemeIndicator"`
+}
+
+// Requests
+
+type RegisterInvoiceRequest struct {
+	XMLName                   xml.Name              `xml:"RegisterInvoiceRequest"`
+	EFaturaMDVersion          EFaturaMDVersion      `xml:"eFaturaMDVersion"`
+	TaxRegistrationNumber     TaxRegistrationNumber `xml:"TaxRegistrationNumber"`
+	TaxEntity                 TaxEntity             `xml:"TaxEntity"`
+	SoftwareCertificateNumber uint                  `xml:"SoftwareCertificateNumber"`
+	InvoiceData               InvoiceDataType       `xml:"InvoiceData"`
+}
