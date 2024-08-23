@@ -181,8 +181,8 @@ func NewInvoiceStatusLetter(value string) InvoiceStatusLetter {
 type InvoiceStatusDate time.Time
 
 type InvoiceStatus struct {
-	XMLName           xml.Name            `xml:"InvoiceStatus"` // XMLName is used to set the name of the XML element
-	InvoiceStatus     InvoiceStatusLetter `xml:"InvoiceStatus"`
+	/* 	XMLName           xml.Name            `xml:"InvoiceStatus"` // XMLName is used to set the name of the XML element
+	 */InvoiceStatus  InvoiceStatusLetter `xml:"InvoiceStatus"`
 	InvoiceStatusDate InvoiceStatusDate   `xml:"InvoiceStatusDate"`
 }
 
@@ -694,18 +694,28 @@ type DateRangeType struct {
 type InvoiceType InvoiceTypeType
 type ATCUD SAFPTtextTypeMandatoryMax100Car
 type CustomerTaxID SAFPTtextTypeMandatoryMax30Car
+
+func NewCustomerTaxID(value string) CustomerTaxID {
+	return CustomerTaxID(NewSAFPTtextTypeMandatoryMax30Car(value))
+}
+
 type CustomerTaxIDCountry TaxIDCountry
+
+func NewCustomerTaxIDCountry(value string) CustomerTaxIDCountry {
+	return CustomerTaxIDCountry(NewTaxIDCountry(value))
+}
+
 type WorkDate time.Time
 type WorkType WorkTypeType
 
 type InvoiceHeaderType struct {
-	XMLName              xml.Name             `xml:"InvoiceHeaderType"`
-	InvoiceNo            InvoiceNo            `xml:"InvoiceNo"`
-	InvoiceDate          InvoiceDate          `xml:"InvoiceDate"`
-	InvoiceType          InvoiceType          `xml:"InvoiceType"`
-	SelfBillingIndicator SelfBillingIndicator `xml:"SelfBillingIndicator"`
-	CustomerTaxID        CustomerTaxID        `xml:"CustomerTaxID"`
-	CustomerTaxIDCountry CustomerTaxIDCountry `xml:"CustomerTaxIDCountry"`
+	/* XMLName              xml.Name             `xml:"InvoiceHeaderType"` */
+	InvoiceNo            InvoiceNo            `xml:"doc:InvoiceNo"`
+	InvoiceDate          InvoiceDate          `xml:"doc:InvoiceDate"`
+	InvoiceType          InvoiceType          `xml:"doc:InvoiceType"`
+	SelfBillingIndicator SelfBillingIndicator `xml:"doc:SelfBillingIndicator"`
+	CustomerTaxID        CustomerTaxID        `xml:"doc:CustomerTaxID"`
+	CustomerTaxIDCountry CustomerTaxIDCountry `xml:"doc:CustomerTaxIDCountry"`
 }
 
 type ListInvoicesDocumentsType struct {
@@ -799,6 +809,9 @@ type InvoiceDataType struct {
 	DocumentStatus         InvoiceStatus          `xml:"DocumentStatus"`
 	HashCharaters          HashCharaters          `xml:"HashCharaters"`
 	CashVATSchemeIndicator CashVATSchemeIndicator `xml:"CashVATSchemeIndicator"`
+	PaperLessIndicator     PaperLessIndicator     `xml:"PaperLessIndicator"`
+	EACCode                EACCode                `xml:"EACCode"` // optional
+	SystemEntryDate        time.Time              `xml:"SystemEntryDate"`
 }
 
 // Requests
@@ -810,4 +823,37 @@ type RegisterInvoiceRequest struct {
 	TaxEntity                 TaxEntity             `xml:"TaxEntity"`
 	SoftwareCertificateNumber uint                  `xml:"SoftwareCertificateNumber"`
 	InvoiceData               InvoiceDataType       `xml:"InvoiceData"`
+}
+
+var a = RegisterInvoiceRequest{
+	EFaturaMDVersion:          NewEFaturaMDVersion(),
+	TaxRegistrationNumber:     NewTaxRegistrationNumber(251487547),
+	TaxEntity:                 NewTaxEntity("Teste"),
+	SoftwareCertificateNumber: 123456789,
+	InvoiceData: InvoiceDataType{
+		InvoiceHeaderType: InvoiceHeaderType{
+			InvoiceNo:            NewInvoiceNo("FT A/1"),
+			InvoiceDate:          time.Now(),
+			InvoiceType:          InvoiceType(InvoiceFT),
+			SelfBillingIndicator: SelfBillingNo,
+			CustomerTaxID:        NewCustomerTaxID("999999999"),
+			CustomerTaxIDCountry: NewCustomerTaxIDCountry("PT"),
+		},
+		DocumentStatus: InvoiceStatus{
+			InvoiceStatus:     InvoiceNormal,
+			InvoiceStatusDate: InvoiceStatusDate(time.Now()),
+		},
+		HashCharaters:          NewHashCharaters("1234"),
+		CashVATSchemeIndicator: CashVATSchemeNo,
+	},
+}
+
+// convert to xml
+func main() {
+	// MarshalIndent is used to format the output
+	output, err := xml.MarshalIndent(a, "", "    ")
+	if err != nil {
+		log.Println("error: ", err)
+	}
+	log.Println(string(output))
 }
