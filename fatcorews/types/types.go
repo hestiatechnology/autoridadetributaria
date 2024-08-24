@@ -691,7 +691,7 @@ type WithholdingTax struct {
 	XMLName xml.Name `xml:"WithholdingTax"`
 	// optional
 	WithholdingTaxType   WithholdingTaxType `xml:"WithholdingTax"`
-	WithholdingTaxAmount MonetaryType       `xml:"WithholdingTaxAmount"`
+	WithholdingTaxAmount decimal.Decimal    `xml:"WithholdingTaxAmount"`
 }
 
 type DateRangeType struct {
@@ -823,7 +823,7 @@ type InvoiceDataType struct {
 	SystemEntryDate        time.Time              `xml:"SystemEntryDate"`
 	LineSummary            []LineSummary          `xml:"LineSummary"`
 	DocumentTotals         DocumentTotals         `xml:"DocumentTotals"`
-	WithholdingTax         []WithholdingTax       `xml:"WithholdingTax"` // optional
+	WithholdingTax         *[]WithholdingTax      `xml:"WithholdingTax"` // optional
 }
 
 type TaxPointDate time.Time
@@ -870,14 +870,14 @@ var a = RegisterInvoiceRequest{
 		},
 		HashCharaters:          NewHashCharaters("1234"),
 		CashVATSchemeIndicator: CashVATSchemeNo,
-		WithholdingTax: []WithholdingTax{
+		WithholdingTax: &[]WithholdingTax{
 			{
 				WithholdingTaxType:   WithholdingTaxIRC,
-				WithholdingTaxAmount: NewMonetaryType(decimal.NewFromFloat(10.0)),
+				WithholdingTaxAmount: decimal.NewFromFloat(10.0111),
 			},
 			{
 				WithholdingTaxType:   WithholdingTaxIRC,
-				WithholdingTaxAmount: NewMonetaryType(decimal.NewFromFloat(20.0)),
+				WithholdingTaxAmount: decimal.NewFromFloat(20.0111),
 			},
 		},
 	},
