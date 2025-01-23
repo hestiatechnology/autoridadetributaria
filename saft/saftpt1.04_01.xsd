@@ -1,5 +1,12 @@
-<?xml version="1.0" encoding="windows-1252"?>
-<xs:schema xmlns:ns="urn:OECD:StandardAuditFile-Tax:PT_1.04_01" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" xmlns:doc="urn:schemas-basda-org:schema-extensions:documentation" xmlns="urn:OECD:StandardAuditFile-Tax:PT_1.04_01" attributeFormDefault="unqualified" elementFormDefault="qualified" id="SAF-T_PT" targetNamespace="urn:OECD:StandardAuditFile-Tax:PT_1.04_01" version="1.04_01" vc:minVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2009/XMLSchema/XMLSchema">
+<?xml version="1.0" encoding="Windows-1252"?>
+<xs:schema xmlns:ns="urn:OECD:StandardAuditFile-Tax:PT_1.04_01"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+    xmlns:doc="urn:schemas-basda-org:schema-extensions:documentation"
+    xmlns="urn:OECD:StandardAuditFile-Tax:PT_1.04_01" attributeFormDefault="unqualified"
+    elementFormDefault="qualified" id="SAF-T_PT"
+    targetNamespace="urn:OECD:StandardAuditFile-Tax:PT_1.04_01" version="1.04_01"
+    vc:minVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2009/XMLSchema/XMLSchema">
     <xs:annotation>
         <xs:documentation>
             <doc:Title>Standard Audit File - Portuguese Version</doc:Title>
@@ -54,12 +61,16 @@
             <xs:selector xpath="ns:MasterFiles/ns:Product"/>
             <xs:field xpath="ns:ProductCode"/>
         </xs:unique>
-        <xs:keyref name="GeneralLedgerEntriesDebitLineAccountIDConstraint" refer="AccountIDConstraint">
-            <xs:selector xpath="ns:GeneralLedgerEntries/ns:Journal/ns:Transaction/ns:Lines/ns:DebitLine"/>
+        <xs:keyref name="GeneralLedgerEntriesDebitLineAccountIDConstraint"
+            refer="AccountIDConstraint">
+            <xs:selector
+                xpath="ns:GeneralLedgerEntries/ns:Journal/ns:Transaction/ns:Lines/ns:DebitLine"/>
             <xs:field xpath="ns:AccountID"/>
         </xs:keyref>
-        <xs:keyref name="GeneralLedgerEntriesCreditLineAccountIDConstraint" refer="AccountIDConstraint">
-            <xs:selector xpath="ns:GeneralLedgerEntries/ns:Journal/ns:Transaction/ns:Lines/ns:CreditLine"/>
+        <xs:keyref name="GeneralLedgerEntriesCreditLineAccountIDConstraint"
+            refer="AccountIDConstraint">
+            <xs:selector
+                xpath="ns:GeneralLedgerEntries/ns:Journal/ns:Transaction/ns:Lines/ns:CreditLine"/>
             <xs:field xpath="ns:AccountID"/>
         </xs:keyref>
         <xs:keyref name="GeneralLedgerEntriesCustomerIDConstraint" refer="CustomerIDConstraint">
@@ -175,8 +186,18 @@
                             <xs:element name="GroupingCode" type="SAFPTGLAccountID" minOccurs="0"/>
                             <xs:element name="TaxonomyCode" type="SAFPTTaxonomyCode" minOccurs="0"/>
                         </xs:sequence>
-                        <xs:assert test="                                 if ((ns:GroupingCategory != 'GM' and not(ns:TaxonomyCode)) or (ns:GroupingCategory eq 'GM' and ns:TaxonomyCode)) then                                     true()                                 else                                     false()"/>
-                        <xs:assert test="                             if ((ns:GroupingCategory eq 'GR' and not(ns:GroupingCode)) or (ns:GroupingCategory eq 'AR' and not(ns:GroupingCode)) or (ns:GroupingCategory eq 'GA' and ns:GroupingCode) or (ns:GroupingCategory eq 'AA' and ns:GroupingCode) or (ns:GroupingCategory eq 'GM' and ns:GroupingCode) or (ns:GroupingCategory eq 'AM' and ns:GroupingCode)) then                             true()                             else                             false()"/>
+<!--                         <xs:assert
+                            test="
+                                if ((ns:GroupingCategory != 'GM' and not(ns:TaxonomyCode)) or (ns:GroupingCategory eq 'GM' and ns:TaxonomyCode)) then
+                                    true()
+                                else
+                                    false()"/>
+                        <xs:assert
+                            test="
+                            if ((ns:GroupingCategory eq 'GR' and not(ns:GroupingCode)) or (ns:GroupingCategory eq 'AR' and not(ns:GroupingCode)) or (ns:GroupingCategory eq 'GA' and ns:GroupingCode) or (ns:GroupingCategory eq 'AA' and ns:GroupingCode) or (ns:GroupingCategory eq 'GM' and ns:GroupingCode) or (ns:GroupingCategory eq 'AM' and ns:GroupingCode)) then
+                            true()
+                            else
+                            false()"/> -->
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -211,7 +232,8 @@
                 <xs:element ref="CompanyName"/>
                 <xs:element ref="Contact" minOccurs="0"/>
                 <xs:element name="BillingAddress" type="AddressStructure"/>
-                <xs:element name="ShipFromAddress" type="AddressStructure" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="ShipFromAddress" type="AddressStructure" minOccurs="0"
+                    maxOccurs="unbounded"/>
                 <xs:element ref="Telephone" minOccurs="0"/>
                 <xs:element ref="Fax" minOccurs="0"/>
                 <xs:element ref="Email" minOccurs="0"/>
@@ -286,32 +308,37 @@
                                         </xs:choice>
                                         <xs:element name="Lines">
                                             <xs:complexType>
-                                                <xs:all>
+                                                <xs:sequence>
                                                   <xs:element name="DebitLine" maxOccurs="unbounded">
                                                   <xs:complexType>
                                                   <xs:sequence>
                                                   <xs:element ref="RecordID"/>
-                                                  <xs:element name="AccountID" type="SAFPTGLAccountID"/>
+                                                  <xs:element name="AccountID"
+                                                  type="SAFPTGLAccountID"/>
                                                   <xs:element ref="SourceDocumentID" minOccurs="0"/>
                                                   <xs:element ref="SystemEntryDate"/>
                                                   <xs:element ref="Description"/>
-                                                  <xs:element name="DebitAmount" type="SAFmonetaryType"/>
+                                                  <xs:element name="DebitAmount"
+                                                  type="SAFmonetaryType"/>
                                                   </xs:sequence>
                                                   </xs:complexType>
                                                   </xs:element>
-                                                  <xs:element name="CreditLine" maxOccurs="unbounded">
+                                                  <xs:element name="CreditLine"
+                                                  maxOccurs="unbounded">
                                                   <xs:complexType>
                                                   <xs:sequence>
                                                   <xs:element ref="RecordID"/>
-                                                  <xs:element name="AccountID" type="SAFPTGLAccountID"/>
+                                                  <xs:element name="AccountID"
+                                                  type="SAFPTGLAccountID"/>
                                                   <xs:element ref="SourceDocumentID" minOccurs="0"/>
                                                   <xs:element ref="SystemEntryDate"/>
                                                   <xs:element ref="Description"/>
-                                                  <xs:element name="CreditAmount" type="SAFmonetaryType"/>
+                                                  <xs:element name="CreditAmount"
+                                                  type="SAFmonetaryType"/>
                                                   </xs:sequence>
                                                   </xs:complexType>
                                                   </xs:element>
-                                                </xs:all>
+                                                </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
                                     </xs:sequence>
@@ -346,7 +373,8 @@
                                                   <xs:element ref="InvoiceStatusDate"/>
                                                   <xs:element ref="Reason" minOccurs="0"/>
                                                   <xs:element ref="SourceID"/>
-                                                  <xs:element name="SourceBilling" type="SAFTPTSourceBilling"/>
+                                                  <xs:element name="SourceBilling"
+                                                  type="SAFTPTSourceBilling"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
@@ -363,13 +391,17 @@
                                         <xs:element ref="CustomerID"/>
                                         <xs:element ref="ShipTo" minOccurs="0" maxOccurs="1"/>
                                         <xs:element ref="ShipFrom" minOccurs="0" maxOccurs="1"/>
-                                        <xs:element ref="MovementEndTime" minOccurs="0" maxOccurs="1"/>
-                                        <xs:element ref="MovementStartTime" minOccurs="0" maxOccurs="1"/>
+                                        <xs:element ref="MovementEndTime" minOccurs="0"
+                                            maxOccurs="1"/>
+                                        <xs:element ref="MovementStartTime" minOccurs="0"
+                                            maxOccurs="1"/>
                                         <xs:element name="Line" maxOccurs="unbounded">
                                             <xs:complexType>
                                                 <xs:sequence>
                                                   <xs:element ref="LineNumber"/>
-                                                  <xs:element name="OrderReferences" type="OrderReferences" minOccurs="0" maxOccurs="unbounded"/>
+                                                  <xs:element name="OrderReferences"
+                                                  type="OrderReferences" minOccurs="0"
+                                                  maxOccurs="unbounded"/>
                                                   <xs:element ref="ProductCode"/>
                                                   <xs:element ref="ProductDescription"/>
                                                   <xs:element ref="Quantity"/>
@@ -377,9 +409,11 @@
                                                   <xs:element ref="UnitPrice"/>
                                                   <xs:element ref="TaxBase" minOccurs="0"/>
                                                   <xs:element ref="TaxPointDate"/>
-                                                  <xs:element name="References" type="References" minOccurs="0" maxOccurs="unbounded"/>
+                                                  <xs:element name="References" type="References"
+                                                  minOccurs="0" maxOccurs="unbounded"/>
                                                   <xs:element ref="Description"/>
-                                                  <xs:element name="ProductSerialNumber" type="ProductSerialNumber" minOccurs="0"/>
+                                                  <xs:element name="ProductSerialNumber"
+                                                  type="ProductSerialNumber" minOccurs="0"/>
                                                   <xs:choice>
                                                   <xs:element ref="DebitAmount"/>
                                                   <xs:element ref="CreditAmount"/>
@@ -388,13 +422,39 @@
                                                   <xs:element ref="TaxExemptionReason" minOccurs="0"/>
                                                   <xs:element ref="TaxExemptionCode" minOccurs="0"/>
                                                   <xs:element ref="SettlementAmount" minOccurs="0"/>
-                                                  <xs:element name="CustomsInformation" type="CustomsInformation" minOccurs="0"/>
+                                                  <xs:element name="CustomsInformation"
+                                                  type="CustomsInformation" minOccurs="0"/>
                                                 </xs:sequence>
-                                                <xs:assert test="                                                         if (not(ns:Tax/ns:TaxAmount) or ((ns:Tax/ns:TaxAmount != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxAmount eq 0 and ns:TaxExemptionReason))) then                                                             true()                                                         else                                                             false()"/>
-                                                <xs:assert test="                                                         if (not(ns:Tax/ns:TaxPercentage) or ((ns:Tax/ns:TaxPercentage != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxPercentage eq 0 and ns:TaxExemptionReason))) then                                                             true()                                                         else                                                             false()"/>
-                                                <xs:assert test="                                                         if ((ns:TaxExemptionReason and not(ns:TaxExemptionCode)) or (ns:TaxExemptionCode and not(ns:TaxExemptionReason))) then                                                             false()                                                         else                                                             true()"/>
-                                                <xs:assert test="                                                         if ((ns:TaxBase and ns:UnitPrice != 0)) then                                                             false()                                                         else                                                             true()"/>
-                                                <xs:assert test="                                                         if ((ns:TaxBase and ns:DebitAmount != 0) or (ns:TaxBase and ns:CreditAmount != 0)) then                                                             false()                                                         else                                                             true()"/>
+<!--                                                 <xs:assert
+                                                  test="
+                                                        if (not(ns:Tax/ns:TaxAmount) or ((ns:Tax/ns:TaxAmount != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxAmount eq 0 and ns:TaxExemptionReason))) then
+                                                            true()
+                                                        else
+                                                            false()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if (not(ns:Tax/ns:TaxPercentage) or ((ns:Tax/ns:TaxPercentage != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxPercentage eq 0 and ns:TaxExemptionReason))) then
+                                                            true()
+                                                        else
+                                                            false()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if ((ns:TaxExemptionReason and not(ns:TaxExemptionCode)) or (ns:TaxExemptionCode and not(ns:TaxExemptionReason))) then
+                                                            false()
+                                                        else
+                                                            true()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if ((ns:TaxBase and ns:UnitPrice != 0)) then
+                                                            false()
+                                                        else
+                                                            true()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if ((ns:TaxBase and ns:DebitAmount != 0) or (ns:TaxBase and ns:CreditAmount != 0)) then
+                                                            false()
+                                                        else
+                                                            true()"/> -->
                                             </xs:complexType>
                                         </xs:element>
                                         <xs:element name="DocumentTotals">
@@ -403,14 +463,18 @@
                                                   <xs:element ref="TaxPayable"/>
                                                   <xs:element ref="NetTotal"/>
                                                   <xs:element ref="GrossTotal"/>
-                                                  <xs:element name="Currency" type="Currency" minOccurs="0"/>
+                                                  <xs:element name="Currency" type="Currency"
+                                                  minOccurs="0"/>
                                                   <!-- A estrutura Settlement representa acordos ou formas de pagamento futuros. Nao constitui em caso algum o somatorio dos descontos concedidos e reflectidos nas linhas dos documentos e a informacao aqui constante nao influi o montante total do documento (GrossTotal) -->
-                                                  <xs:element name="Settlement" type="Settlement" minOccurs="0" maxOccurs="unbounded"/>
-                                                  <xs:element name="Payment" type="PaymentMethod" minOccurs="0" maxOccurs="unbounded"/>
+                                                  <xs:element name="Settlement" type="Settlement"
+                                                  minOccurs="0" maxOccurs="unbounded"/>
+                                                  <xs:element name="Payment" type="PaymentMethod"
+                                                  minOccurs="0" maxOccurs="unbounded"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
-                                        <xs:element name="WithholdingTax" type="WithholdingTax" minOccurs="0" maxOccurs="unbounded"/>
+                                        <xs:element name="WithholdingTax" type="WithholdingTax"
+                                            minOccurs="0" maxOccurs="unbounded"/>
                                     </xs:sequence>
                                 </xs:complexType>
                             </xs:element>
@@ -435,7 +499,8 @@
                                                   <xs:element ref="MovementStatusDate"/>
                                                   <xs:element ref="Reason" minOccurs="0"/>
                                                   <xs:element ref="SourceID"/>
-                                                  <xs:element name="SourceBilling" type="SAFTPTSourceBilling"/>
+                                                  <xs:element name="SourceBilling"
+                                                  type="SAFTPTSourceBilling"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
@@ -455,7 +520,8 @@
                                         <xs:element ref="MovementComments" minOccurs="0"/>
                                         <xs:element ref="ShipTo" minOccurs="0" maxOccurs="1"/>
                                         <xs:element ref="ShipFrom" minOccurs="0" maxOccurs="1"/>
-                                        <xs:element ref="MovementEndTime" minOccurs="0" maxOccurs="1"/>
+                                        <xs:element ref="MovementEndTime" minOccurs="0"
+                                            maxOccurs="1"/>
                                         <xs:element ref="MovementStartTime" maxOccurs="1"/>
                                         <!-- Nos documentos resumo (MovementStatus "R"), na falta desta informacao em concreto, a hora de inicio de transporte (MovementStartTime) pode ser indicada com a concatenacao da data constante no campo MovementDate com a hora 00:00:00-->
                                         <xs:element ref="ATDocCodeID" minOccurs="0" maxOccurs="1"/>
@@ -463,26 +529,42 @@
                                             <xs:complexType>
                                                 <xs:sequence>
                                                   <xs:element ref="LineNumber"/>
-                                                  <xs:element name="OrderReferences" type="OrderReferences" minOccurs="0" maxOccurs="unbounded"/>
+                                                  <xs:element name="OrderReferences"
+                                                  type="OrderReferences" minOccurs="0"
+                                                  maxOccurs="unbounded"/>
                                                   <xs:element ref="ProductCode"/>
                                                   <xs:element ref="ProductDescription"/>
                                                   <xs:element ref="Quantity"/>
                                                   <xs:element ref="UnitOfMeasure"/>
                                                   <xs:element ref="UnitPrice"/>
                                                   <xs:element ref="Description"/>
-                                                  <xs:element name="ProductSerialNumber" type="ProductSerialNumber" minOccurs="0"/>
+                                                  <xs:element name="ProductSerialNumber"
+                                                  type="ProductSerialNumber" minOccurs="0"/>
                                                   <xs:choice>
                                                   <xs:element ref="DebitAmount"/>
                                                   <xs:element ref="CreditAmount"/>
                                                   </xs:choice>
-                                                  <xs:element name="Tax" type="MovementTax" minOccurs="0"/>
+                                                  <xs:element name="Tax" type="MovementTax"
+                                                  minOccurs="0"/>
                                                   <xs:element ref="TaxExemptionReason" minOccurs="0"/>
                                                   <xs:element ref="TaxExemptionCode" minOccurs="0"/>
                                                   <xs:element ref="SettlementAmount" minOccurs="0"/>
-                                                  <xs:element name="CustomsInformation" type="CustomsInformation" minOccurs="0"/>
+                                                  <xs:element name="CustomsInformation"
+                                                  type="CustomsInformation" minOccurs="0"/>
                                                 </xs:sequence>
-                                                <xs:assert test="                                                         if (not(ns:Tax/ns:TaxPercentage) or ((ns:Tax/ns:TaxPercentage != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxPercentage eq 0 and ns:TaxExemptionReason))) then                                                             true()                                                         else                                                             false()"/>
-                                                <xs:assert test="                                                         if ((ns:TaxExemptionReason and not(ns:TaxExemptionCode)) or (ns:TaxExemptionCode and not(ns:TaxExemptionReason))) then                                                             false()                                                         else                                                             true()"/>
+                                                <!-- <xs:assert
+                                                  test="
+                                                        if (not(ns:Tax/ns:TaxPercentage) or ((ns:Tax/ns:TaxPercentage != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxPercentage eq 0 and ns:TaxExemptionReason))) then
+                                                            true()
+                                                        else
+                                                            false()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if ((ns:TaxExemptionReason and not(ns:TaxExemptionCode)) or (ns:TaxExemptionCode and not(ns:TaxExemptionReason))) then
+                                                            false()
+                                                        else
+                                                            true()"
+                                                /> -->
                                             </xs:complexType>
                                         </xs:element>
                                         <xs:element name="DocumentTotals">
@@ -491,7 +573,8 @@
                                                   <xs:element ref="TaxPayable"/>
                                                   <xs:element ref="NetTotal"/>
                                                   <xs:element ref="GrossTotal"/>
-                                                  <xs:element name="Currency" type="Currency" minOccurs="0"/>
+                                                  <xs:element name="Currency" type="Currency"
+                                                  minOccurs="0"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
@@ -519,7 +602,8 @@
                                                   <xs:element ref="WorkStatusDate"/>
                                                   <xs:element ref="Reason" minOccurs="0"/>
                                                   <xs:element ref="SourceID"/>
-                                                  <xs:element name="SourceBilling" type="SAFTPTSourceBilling"/>
+                                                  <xs:element name="SourceBilling"
+                                                  type="SAFTPTSourceBilling"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
@@ -537,7 +621,9 @@
                                             <xs:complexType>
                                                 <xs:sequence>
                                                   <xs:element ref="LineNumber"/>
-                                                  <xs:element name="OrderReferences" type="OrderReferences" minOccurs="0" maxOccurs="unbounded"/>
+                                                  <xs:element name="OrderReferences"
+                                                  type="OrderReferences" minOccurs="0"
+                                                  maxOccurs="unbounded"/>
                                                   <xs:element ref="ProductCode"/>
                                                   <xs:element ref="ProductDescription"/>
                                                   <xs:element ref="Quantity"/>
@@ -545,9 +631,11 @@
                                                   <xs:element ref="UnitPrice"/>
                                                   <xs:element ref="TaxBase" minOccurs="0"/>
                                                   <xs:element ref="TaxPointDate"/>
-                                                  <xs:element name="References" type="References" minOccurs="0" maxOccurs="unbounded"/>
+                                                  <xs:element name="References" type="References"
+                                                  minOccurs="0" maxOccurs="unbounded"/>
                                                   <xs:element ref="Description"/>
-                                                  <xs:element name="ProductSerialNumber" type="ProductSerialNumber" minOccurs="0"/>
+                                                  <xs:element name="ProductSerialNumber"
+                                                  type="ProductSerialNumber" minOccurs="0"/>
                                                   <xs:choice>
                                                   <xs:element ref="DebitAmount"/>
                                                   <xs:element ref="CreditAmount"/>
@@ -556,13 +644,39 @@
                                                   <xs:element ref="TaxExemptionReason" minOccurs="0"/>
                                                   <xs:element ref="TaxExemptionCode" minOccurs="0"/>
                                                   <xs:element ref="SettlementAmount" minOccurs="0"/>
-                                                  <xs:element name="CustomsInformation" type="CustomsInformation" minOccurs="0"/>
+                                                  <xs:element name="CustomsInformation"
+                                                  type="CustomsInformation" minOccurs="0"/>
                                                 </xs:sequence>
-                                                <xs:assert test="                                                         if (not(ns:Tax/ns:TaxAmount) or ((ns:Tax/ns:TaxAmount != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxAmount eq 0 and ns:TaxExemptionReason))) then                                                             true()                                                         else                                                             false()"/>
-                                                <xs:assert test="                                                         if (not(ns:Tax/ns:TaxPercentage) or ((ns:Tax/ns:TaxPercentage != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxPercentage eq 0 and ns:TaxExemptionReason))) then                                                             true()                                                         else                                                             false()"/>
-                                                <xs:assert test="                                                         if ((ns:TaxExemptionReason and not(ns:TaxExemptionCode)) or (ns:TaxExemptionCode and not(ns:TaxExemptionReason))) then                                                             false()                                                         else                                                             true()"/>
-                                                <xs:assert test="                                                         if ((ns:TaxBase and ns:UnitPrice != 0)) then                                                             false()                                                         else                                                             true()"/>
-                                                <xs:assert test="                                                         if ((ns:TaxBase and ns:DebitAmount != 0) or (ns:TaxBase and ns:CreditAmount != 0)) then                                                             false()                                                         else                                                             true()"/>
+                                                <!-- <xs:assert
+                                                  test="
+                                                        if (not(ns:Tax/ns:TaxAmount) or ((ns:Tax/ns:TaxAmount != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxAmount eq 0 and ns:TaxExemptionReason))) then
+                                                            true()
+                                                        else
+                                                            false()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if (not(ns:Tax/ns:TaxPercentage) or ((ns:Tax/ns:TaxPercentage != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxPercentage eq 0 and ns:TaxExemptionReason))) then
+                                                            true()
+                                                        else
+                                                            false()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if ((ns:TaxExemptionReason and not(ns:TaxExemptionCode)) or (ns:TaxExemptionCode and not(ns:TaxExemptionReason))) then
+                                                            false()
+                                                        else
+                                                            true()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if ((ns:TaxBase and ns:UnitPrice != 0)) then
+                                                            false()
+                                                        else
+                                                            true()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if ((ns:TaxBase and ns:DebitAmount != 0) or (ns:TaxBase and ns:CreditAmount != 0)) then
+                                                            false()
+                                                        else
+                                                            true()"/> -->
                                             </xs:complexType>
                                         </xs:element>
                                         <xs:element name="DocumentTotals">
@@ -571,7 +685,8 @@
                                                   <xs:element ref="TaxPayable"/>
                                                   <xs:element ref="NetTotal"/>
                                                   <xs:element ref="GrossTotal"/>
-                                                  <xs:element name="Currency" type="Currency" minOccurs="0"/>
+                                                  <xs:element name="Currency" type="Currency"
+                                                  minOccurs="0"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
@@ -605,11 +720,13 @@
                                                   <xs:element ref="PaymentStatusDate"/>
                                                   <xs:element ref="Reason" minOccurs="0"/>
                                                   <xs:element ref="SourceID"/>
-                                                  <xs:element name="SourcePayment" type="SAFTPTSourcePayment"/>
+                                                  <xs:element name="SourcePayment"
+                                                  type="SAFTPTSourcePayment"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
-                                        <xs:element name="PaymentMethod" type="PaymentMethod" minOccurs="0" maxOccurs="unbounded"/>
+                                        <xs:element name="PaymentMethod" type="PaymentMethod"
+                                            minOccurs="0" maxOccurs="unbounded"/>
                                         <xs:element ref="SourceID"/>
                                         <xs:element ref="SystemEntryDate"/>
                                         <xs:element ref="CustomerID"/>
@@ -617,7 +734,8 @@
                                             <xs:complexType>
                                                 <xs:sequence>
                                                   <xs:element ref="LineNumber"/>
-                                                  <xs:element name="SourceDocumentID" maxOccurs="unbounded">
+                                                  <xs:element name="SourceDocumentID"
+                                                  maxOccurs="unbounded">
                                                   <xs:complexType>
                                                   <xs:sequence>
                                                   <xs:element ref="OriginatingON"/>
@@ -631,14 +749,36 @@
                                                   <xs:element ref="DebitAmount"/>
                                                   <xs:element ref="CreditAmount"/>
                                                   </xs:choice>
-                                                  <xs:element name="Tax" type="PaymentTax" minOccurs="0"/>
+                                                  <xs:element name="Tax" type="PaymentTax"
+                                                  minOccurs="0"/>
                                                   <xs:element ref="TaxExemptionReason" minOccurs="0"/>
                                                   <xs:element ref="TaxExemptionCode" minOccurs="0"/>
                                                 </xs:sequence>
-                                                <xs:assert test="                                                         if (not(ns:Tax/ns:TaxAmount) or ((ns:Tax/ns:TaxAmount != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxAmount eq 0 and ns:TaxExemptionReason))) then                                                             true()                                                         else                                                             false()"/>
-                                                <xs:assert test="                                                         if (not(ns:Tax/ns:TaxPercentage) or ((ns:Tax/ns:TaxPercentage != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxPercentage eq 0 and ns:TaxExemptionReason))) then                                                             true()                                                         else                                                             false()"/>
-                                                <xs:assert test="                                                         if ((ns:TaxExemptionReason and not(ns:TaxExemptionCode)) or (ns:TaxExemptionCode and not(ns:TaxExemptionReason))) then                                                             false()                                                         else                                                             true()"/>
-                                                <xs:assert test="                                                         if (../ns:PaymentType eq 'RC' and not(ns:Tax)) then                                                             false()                                                         else                                                             true()"/>
+                                                <!-- <xs:assert
+                                                  test="
+                                                        if (not(ns:Tax/ns:TaxAmount) or ((ns:Tax/ns:TaxAmount != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxAmount eq 0 and ns:TaxExemptionReason))) then
+                                                            true()
+                                                        else
+                                                            false()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if (not(ns:Tax/ns:TaxPercentage) or ((ns:Tax/ns:TaxPercentage != 0 and not(ns:TaxExemptionReason)) or (ns:Tax/ns:TaxPercentage eq 0 and ns:TaxExemptionReason))) then
+                                                            true()
+                                                        else
+                                                            false()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if ((ns:TaxExemptionReason and not(ns:TaxExemptionCode)) or (ns:TaxExemptionCode and not(ns:TaxExemptionReason))) then
+                                                            false()
+                                                        else
+                                                            true()"/>
+                                                <xs:assert
+                                                  test="
+                                                        if (../ns:PaymentType eq 'RC' and not(ns:Tax)) then
+                                                            false()
+                                                        else
+                                                            true()"
+                                                /> -->
                                             </xs:complexType>
                                         </xs:element>
                                         <xs:element name="DocumentTotals">
@@ -655,13 +795,21 @@
                                                   </xs:sequence>
                                                   </xs:complexType>
                                                   </xs:element>
-                                                  <xs:element name="Currency" type="Currency" minOccurs="0"/>
+                                                  <xs:element name="Currency" type="Currency"
+                                                  minOccurs="0"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
-                                        <xs:element name="WithholdingTax" type="WithholdingTax" minOccurs="0" maxOccurs="unbounded"/>
+                                        <xs:element name="WithholdingTax" type="WithholdingTax"
+                                            minOccurs="0" maxOccurs="unbounded"/>
                                     </xs:sequence>
-                                    <xs:assert test="                                             if ((ns:Line/ns:Tax/ns:TaxType and ns:PaymentType eq 'RC') or (ns:PaymentType eq 'RG')) then                                                 true()                                             else                                                 false()"/>
+                                    <!-- <xs:assert
+                                        test="
+                                            if ((ns:Line/ns:Tax/ns:TaxType and ns:PaymentType eq 'RC') or (ns:PaymentType eq 'RG')) then
+                                                true()
+                                            else
+                                                false()"
+                                    /> -->
                                 </xs:complexType>
                             </xs:element>
                         </xs:sequence>
@@ -770,7 +918,8 @@
     <!-- Estrutura de Acordos entre cliente e fornecedor-->
     <xs:complexType name="Settlement">
         <xs:sequence>
-            <xs:element name="SettlementDiscount" type="SAFPTtextTypeMandatoryMax30Car" minOccurs="0"/>
+            <xs:element name="SettlementDiscount" type="SAFPTtextTypeMandatoryMax30Car"
+                minOccurs="0"/>
             <xs:element name="SettlementAmount" type="SAFmonetaryType" minOccurs="0"/>
             <xs:element name="SettlementDate" type="SAFdateType" minOccurs="0"/>
             <xs:element name="PaymentTerms" type="SAFPTtextTypeMandatoryMax100Car" minOccurs="0"/>
@@ -812,7 +961,8 @@
     <xs:complexType name="WithholdingTax">
         <xs:sequence>
             <xs:element ref="WithholdingTaxType" minOccurs="0"/>
-            <xs:element name="WithholdingTaxDescription" type="SAFPTtextTypeMandatoryMax60Car" minOccurs="0"/>
+            <xs:element name="WithholdingTaxDescription" type="SAFPTtextTypeMandatoryMax60Car"
+                minOccurs="0"/>
             <xs:element name="WithholdingTaxAmount" type="SAFmonetaryType"/>
         </xs:sequence>
     </xs:complexType>
@@ -969,7 +1119,8 @@
     <xs:element name="Country">
         <xs:simpleType>
             <xs:restriction base="xs:string">
-                <xs:pattern value="AD|AE|AF|AG|AI|AL|AM|AO|AQ|AR|AS|AT|AU|AW|AX|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BV|BW|BY|BZ|CA|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EE|EG|EH|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GP|GQ|GR|GS|GT|GU|GW|GY|HK|HM|HN|HR|HT|HU|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KM|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|MA|MC|MD|ME|MF|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MV|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RS|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TF|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TW|TZ|UA|UG|UM|US|UY|UZ|VA|VC|VE|VG|VI|VN|VU|WF|WS|XK|YE|YT|ZA|ZM|ZW"/>
+                <xs:pattern
+                    value="AD|AE|AF|AG|AI|AL|AM|AO|AQ|AR|AS|AT|AU|AW|AX|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BV|BW|BY|BZ|CA|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EE|EG|EH|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GP|GQ|GR|GS|GT|GU|GW|GY|HK|HM|HN|HR|HT|HU|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KM|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|MA|MC|MD|ME|MF|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MV|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RS|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TF|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TW|TZ|UA|UG|UM|US|UY|UZ|VA|VC|VE|VG|VI|VN|VU|WF|WS|XK|YE|YT|ZA|ZM|ZW"/>
             </xs:restriction>
         </xs:simpleType>
     </xs:element>
@@ -978,7 +1129,8 @@
         <!-- Nao consta o EUR por nao existirem situacoes que requeiram este codigo de moeda -->
         <xs:simpleType>
             <xs:restriction base="xs:string">
-                <xs:pattern value="AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BOV|BRL|BSD|BTN|BWP|BYN|BYR|BZD|CAD|CDF|CHE|CHF|CHW|CLF|CLP|CNY|COP|COU|CRC|CUC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LTL|LVL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRO|MRU|MUR|MVR|MWK|MXN|MXV|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SLL|SOS|SRD|SSP|STD|STN|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|USN|USS|UYI|UYU|UZS|VED|VEF|VES|VND|VUV|WST|XAF|XAG|XAU|XBA|XBB|XBC|XBD|XCD|XDR|XFU|XOF|XPD|XPF|XPT|XSU|XUA|YER|ZAR|ZMW|ZWL|EEK|SKK|TMM|ZMK|ZWD|ZWR"/>
+                <xs:pattern
+                    value="AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BOV|BRL|BSD|BTN|BWP|BYN|BYR|BZD|CAD|CDF|CHE|CHF|CHW|CLF|CLP|CNY|COP|COU|CRC|CUC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LTL|LVL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRO|MRU|MUR|MVR|MWK|MXN|MXV|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SLL|SOS|SRD|SSP|STD|STN|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|USN|USS|UYI|UYU|UZS|VED|VEF|VES|VND|VUV|WST|XAF|XAG|XAU|XBA|XBB|XBC|XBD|XCD|XDR|XFU|XOF|XPD|XPF|XPT|XSU|XUA|YER|ZAR|ZMW|ZWL|EEK|SKK|TMM|ZMK|ZWD|ZWR"/>
             </xs:restriction>
         </xs:simpleType>
     </xs:element>
@@ -1255,7 +1407,8 @@
     <xs:element name="TaxCountryRegion">
         <xs:simpleType>
             <xs:restriction base="xs:string">
-                <xs:pattern value="AD|AE|AF|AG|AI|AL|AM|AO|AQ|AR|AS|AT|AU|AW|AX|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BV|BW|BY|BZ|CA|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EE|EG|EH|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GP|GQ|GR|GS|GT|GU|GW|GY|HK|HM|HN|HR|HT|HU|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KM|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|MA|MC|MD|ME|MF|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MV|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RS|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TF|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TW|TZ|UA|UG|UM|US|UY|UZ|VA|VC|VE|VG|VI|VN|VU|WF|WS|XK|YE|YT|ZA|ZM|ZW|PT-AC|PT-MA"/>
+                <xs:pattern
+                    value="AD|AE|AF|AG|AI|AL|AM|AO|AQ|AR|AS|AT|AU|AW|AX|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BV|BW|BY|BZ|CA|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EE|EG|EH|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GP|GQ|GR|GS|GT|GU|GW|GY|HK|HM|HN|HR|HT|HU|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KM|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|MA|MC|MD|ME|MF|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MV|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RS|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TF|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TW|TZ|UA|UG|UM|US|UY|UZ|VA|VC|VE|VG|VI|VN|VU|WF|WS|XK|YE|YT|ZA|ZM|ZW|PT-AC|PT-MA"/>
             </xs:restriction>
         </xs:simpleType>
     </xs:element>
@@ -1399,7 +1552,8 @@
     <!-- Codigo do pais (ISO 3166 1-alpha-2) do cliente -->
     <xs:simpleType name="CustomerCountry">
         <xs:restriction base="xs:string">
-            <xs:pattern value="AD|AE|AF|AG|AI|AL|AM|AO|AQ|AR|AS|AT|AU|AW|AX|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BV|BW|BY|BZ|CA|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EE|EG|EH|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GP|GQ|GR|GS|GT|GU|GW|GY|HK|HM|HN|HR|HT|HU|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KM|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|MA|MC|MD|ME|MF|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MV|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RS|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TF|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TW|TZ|UA|UG|UM|US|UY|UZ|VA|VC|VE|VG|VI|VN|VU|WF|WS|XK|YE|YT|ZA|ZM|ZW|Desconhecido"/>
+            <xs:pattern
+                value="AD|AE|AF|AG|AI|AL|AM|AO|AQ|AR|AS|AT|AU|AW|AX|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BV|BW|BY|BZ|CA|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EE|EG|EH|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GP|GQ|GR|GS|GT|GU|GW|GY|HK|HM|HN|HR|HT|HU|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KM|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|MA|MC|MD|ME|MF|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MV|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RS|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TF|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TW|TZ|UA|UG|UM|US|UY|UZ|VA|VC|VE|VG|VI|VN|VU|WF|WS|XK|YE|YT|ZA|ZM|ZW|Desconhecido"/>
         </xs:restriction>
     </xs:simpleType>
     <!-- Codigo de moeda usada no SAFT-->

@@ -2,9 +2,11 @@ package saft
 
 import (
 	"encoding/xml"
+	"os"
 	"regexp"
 
 	err "github.com/hestiatechnology/autoridadetributaria/saft/err"
+	"golang.org/x/net/html/charset"
 )
 
 func (a *AuditFile) Validate() error {
@@ -284,13 +286,36 @@ func (a *AuditFile) ExportInvoicing() (string, error) {
 
 func (a *AuditFile) ToXML() (string, error) {
 	// Convert the AuditFile to XML
-	if err := a.Validate(); err != nil {
-		return "", err
-	}
+	//if err := a.Validate(); err != nil {
+	//	return "", err
+	//}
 
 	out, err := xml.MarshalIndent(a, "", "    ")
 	if err != nil {
 		return "", err
 	}
 	return xml.Header + string(out), nil
+}
+
+func FromXML(xmlFile string) (*AuditFile, error) {
+	// Read the XML file
+	file, err := os.Open(xmlFile)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// Unmarshal the XML file
+	a := &AuditFile{}
+	decoder := xml.NewDecoder(file)
+	decoder.CharsetReader = charset.NewReaderLabel
+	if err := decoder.Decode(a); err != nil {
+		return nil, err
+	}
+
+	// Validate the AuditFile
+	//f err := a.Validate(); err != nil {
+	//	return nil, err
+	//
+	return a, nil
 }
