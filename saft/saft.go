@@ -285,6 +285,10 @@ func (a *AuditFile) ExportInvoicing() (string, error) {
 }
 
 func (a *AuditFile) ToXML() (string, error) {
+	a.XmlnsXsd = "http://www.w3.org/2001/XMLSchema"
+	a.XmlnsXsi = "http://www.w3.org/2001/XMLSchema-instance"
+	a.XmlnsXsd = "http://www.w3.org/2001/XMLSchema"
+	a.XsiSchemaLocation = "urn:OECD:StandardAuditFile-Tax:PT_1.04_01 ../saftpt1.04_01.xsd"
 	// Convert the AuditFile to XML
 	//if err := a.Validate(); err != nil {
 	//	return "", err

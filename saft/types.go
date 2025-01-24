@@ -10,7 +10,10 @@ import (
 
 // Element
 type AuditFile struct {
-	XMLName xml.Name `xml:"urn:OECD:StandardAuditFile-Tax:PT_1.04_01 AuditFile"`
+	XMLName           xml.Name `xml:"urn:OECD:StandardAuditFile-Tax:PT_1.04_01 AuditFile"`
+	XmlnsXsi          string   `xml:"xmlns:xsi,attr"`
+	XmlnsXsd          string   `xml:"xmlns:xsd,attr"`
+	XsiSchemaLocation string   `xml:"xsi:schemaLocation,attr"`
 
 	Header Header `xml:"Header"`
 
@@ -1389,6 +1392,10 @@ type InvoiceLine struct {
 
 	ProductSerialNumber *ProductSerialNumber `xml:"ProductSerialNumber"`
 
+	DebitAmount *SafmonetaryType `xml:"DebitAmount"`
+
+	CreditAmount *SafmonetaryType `xml:"CreditAmount"`
+
 	Tax Tax `xml:"Tax"`
 
 	TaxExemptionReason *SafptportugueseTaxExemptionReason `xml:"TaxExemptionReason"`
@@ -1398,10 +1405,6 @@ type InvoiceLine struct {
 	SettlementAmount *SafmonetaryType `xml:"SettlementAmount"`
 
 	CustomsInformation *CustomsInformation `xml:"CustomsInformation"`
-
-	DebitAmount *SafmonetaryType `xml:"DebitAmount"`
-
-	CreditAmount *SafmonetaryType `xml:"CreditAmount"`
 }
 
 // Element
@@ -1761,15 +1764,15 @@ type PaymentLine struct {
 
 	SettlementAmount *SafmonetaryType `xml:"SettlementAmount"`
 
+	DebitAmount *SafmonetaryType `xml:"DebitAmount"`
+
+	CreditAmount *SafmonetaryType `xml:"CreditAmount"`
+
 	Tax *PaymentTax `xml:"Tax"`
 
 	TaxExemptionReason *SafptportugueseTaxExemptionReason `xml:"TaxExemptionReason"`
 
 	TaxExemptionCode *SafptportugueseTaxExemptionCode `xml:"TaxExemptionCode"`
-
-	DebitAmount *SafmonetaryType `xml:"DebitAmount"`
-
-	CreditAmount *SafmonetaryType `xml:"CreditAmount"`
 }
 
 // Element
@@ -1847,7 +1850,7 @@ type SourceDocumentsPayments struct {
 // XSD ComplexType declarations
 
 type AddressStructure struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	BuildingNumber *SafpttextTypeMandatoryMax10Car `xml:"BuildingNumber"`
 
@@ -1865,7 +1868,7 @@ type AddressStructure struct {
 }
 
 type CustomerAddressStructure struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	BuildingNumber *SafpttextTypeMandatoryMax10Car `xml:"BuildingNumber"`
 
@@ -1883,7 +1886,7 @@ type CustomerAddressStructure struct {
 }
 
 type Currency struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	CurrencyCode string `xml:"CurrencyCode"`
 
@@ -1893,7 +1896,7 @@ type Currency struct {
 }
 
 type CustomsDetails struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	Cncode []Safptcncode `xml:"CNCode"`
 
@@ -1901,7 +1904,7 @@ type CustomsDetails struct {
 }
 
 type CustomsInformation struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	Arcno []SafpttextTypeMandatoryMax21Car `xml:"ARCNo"`
 
@@ -1909,7 +1912,7 @@ type CustomsInformation struct {
 }
 
 type MovementTax struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	TaxType SaftptmovementTaxType `xml:"TaxType"`
 
@@ -1921,7 +1924,7 @@ type MovementTax struct {
 }
 
 type OrderReferences struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	OriginatingOn *SafpttextTypeMandatoryMax60Car `xml:"OriginatingON"`
 
@@ -1929,9 +1932,9 @@ type OrderReferences struct {
 }
 
 type PaymentMethod struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
-	PaymentMechanism string `xml:"PaymentMechanism"`
+	PaymentMechanism *string `xml:"PaymentMechanism"`
 
 	PaymentAmount SafmonetaryType `xml:"PaymentAmount"`
 
@@ -1939,7 +1942,7 @@ type PaymentMethod struct {
 }
 
 type PaymentTax struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	TaxType string `xml:"TaxType"`
 
@@ -1953,13 +1956,13 @@ type PaymentTax struct {
 }
 
 type ProductSerialNumber struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	SerialNumber []SafpttextTypeMandatoryMax100Car `xml:",any"`
 }
 
 type References struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	Reference *SafpttextTypeMandatoryMax60Car `xml:"Reference"`
 
@@ -1967,7 +1970,7 @@ type References struct {
 }
 
 type Settlement struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	SettlementDiscount *SafpttextTypeMandatoryMax30Car `xml:"SettlementDiscount"`
 
@@ -1979,7 +1982,7 @@ type Settlement struct {
 }
 
 type ShippingPointStructure struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	DeliveryId []SafpttextTypeMandatoryMax255Car `xml:"DeliveryID"`
 
@@ -1989,7 +1992,7 @@ type ShippingPointStructure struct {
 }
 
 type SpecialRegimes struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	SelfBillingIndicator string `xml:"SelfBillingIndicator"`
 
@@ -1999,7 +2002,7 @@ type SpecialRegimes struct {
 }
 
 type Tax struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
 	TaxType string `xml:"TaxType"`
 
@@ -2013,9 +2016,9 @@ type Tax struct {
 }
 
 type WithholdingTax struct {
-	XMLName xml.Name
+	//XMLName xml.Name
 
-	WithholdingTaxType string `xml:"WithholdingTaxType"`
+	WithholdingTaxType *string `xml:"WithholdingTaxType"`
 
 	WithholdingTaxDescription *SafpttextTypeMandatoryMax60Car `xml:"WithholdingTaxDescription"`
 
@@ -2031,6 +2034,45 @@ type SafdateType string
 type SafdecimalType decimal.Decimal
 
 type SafmonetaryType decimal.Decimal
+
+func (s SafdecimalType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	value := decimal.Decimal(s).String()
+	return e.EncodeElement(value, start)
+}
+
+// Convert SafmonetaryType to XML
+func (s SafmonetaryType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	value := decimal.Decimal(s).String()
+	return e.EncodeElement(value, start)
+}
+
+// Read SafdecimalType from XML
+func (s *SafdecimalType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var value string
+	if err := d.DecodeElement(&value, &start); err != nil {
+		return err
+	}
+	decimalValue, err := decimal.NewFromString(value)
+	if err != nil {
+		return err
+	}
+	*s = SafdecimalType(decimalValue)
+	return nil
+}
+
+// Read SafmonetaryType from XML
+func (s *SafmonetaryType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var value string
+	if err := d.DecodeElement(&value, &start); err != nil {
+		return err
+	}
+	decimalValue, err := decimal.NewFromString(value)
+	if err != nil {
+		return err
+	}
+	*s = SafmonetaryType(decimalValue)
+	return nil
+}
 
 type CustomerCountry string
 
