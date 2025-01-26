@@ -136,6 +136,54 @@ func (a *AuditFile) checkHeader() error {
 		return errcodes.ErrInvalidFiscalYear
 	}
 
+	if a.Header.StartDate == (SafptdateSpan{}) {
+		return errcodes.ErrInvalidStartDate
+	}
+
+	if a.Header.EndDate == (SafptdateSpan{}) {
+		return errcodes.ErrInvalidEndDate
+	}
+
+	if time.Time(a.Header.StartDate).After(time.Time(a.Header.EndDate)) {
+		return errcodes.ErrInvalidDateSpan
+	}
+
+	if a.Header.CurrencyCode != "EUR" {
+		return errcodes.ErrCurrencyNotEuro
+	}
+
+	if a.Header.DateCreated == (SafptdateSpan{}) {
+		return errcodes.ErrMissingDateCreated
+	}
+
+	if a.Header.TaxEntity == "" {
+		return errcodes.ErrMissingTaxEntity
+	}
+
+	if a.Header.ProductCompanyTaxId == "" {
+		return errcodes.ErrMissingProductCompanyTaxId
+	}
+
+	if len(a.Header.ProductCompanyTaxId) != 9 {
+		return common.ErrInvalidNIFPT
+	}
+
+	ok = common.ValidateNIFPT(string(a.Header.ProductCompanyTaxId))
+	if !ok {
+		return common.ErrInvalidNIFPT
+	}
+
+	//SoftwareCertificateNumber is by default 0, which is a valid value
+
+	r = regexp.MustCompile(`[^/]+\/[^/]+`)
+	if !r.MatchString(string(a.Header.ProductId)) {
+		return errcodes.ErrInvalidProductId
+	}
+
+	if a.Header.ProductVersion == "" {
+		return errcodes.ErrMissingProductVersion
+	}
+
 	return nil
 }
 

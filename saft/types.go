@@ -4,6 +4,7 @@ package saft
 
 import (
 	"encoding/xml"
+	"errors"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -2126,6 +2127,9 @@ type Safptcncode string
 type SafptdateSpan time.Time
 
 func (s SafptdateSpan) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if s == (SafptdateSpan{}) {
+		return errors.New("empty date")
+	}
 	value := time.Time(s).Format("2006-01-02")
 	return e.EncodeElement(value, start)
 }
@@ -2134,6 +2138,9 @@ func (s *SafptdateSpan) UnmarshalXML(d *xml.Decoder, start xml.StartElement) err
 	var value string
 	if err := d.DecodeElement(&value, &start); err != nil {
 		return err
+	}
+	if value == "" {
+		return errors.New("empty date string")
 	}
 	date, err := time.Parse("2006-01-02", value)
 	if err != nil {
