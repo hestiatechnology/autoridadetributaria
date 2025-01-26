@@ -1,4 +1,4 @@
-package errorcodes
+package errcodes
 
 import "errors"
 

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Altered xs:any to xs:all when required and removed asserts-->
 <xs:schema xmlns:ns="urn:OECD:StandardAuditFile-Tax:PT_1.04_01"
     xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
     xmlns:doc="urn:schemas-basda-org:schema-extensions:documentation"
