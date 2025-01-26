@@ -1,5 +1,7 @@
 package common
 
+import "errors"
+
 // CountryCodes is a list of ISO 3166-1 alpha-2 country codes.
 // Obtained via the UN Statistics Division.
 // https://unstats.un.org/unsd/methodology/m49/overview/
@@ -74,3 +76,7 @@ func ValidateNIFPT(nif string) bool {
 	lastDigit := int(nif[8] - '0')
 	return lastDigit == comp
 }
+
+var (
+	ErrInvalidNIFPT = errors.New("invalid nif")
+)

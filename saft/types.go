@@ -4,6 +4,7 @@ package saft
 
 import (
 	"encoding/xml"
+	"time"
 
 	"github.com/shopspring/decimal"
 )
@@ -2027,9 +2028,45 @@ type WithholdingTax struct {
 
 // XSD SimpleType declarations
 
-type SafdateTimeType string
+type SafdateTimeType time.Time
 
-type SafdateType string
+func (s SafdateTimeType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	value := time.Time(s).Format("2006-01-02T15:04:05")
+	return e.EncodeElement(value, start)
+}
+
+func (s *SafdateTimeType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var value string
+	if err := d.DecodeElement(&value, &start); err != nil {
+		return err
+	}
+	date, err := time.Parse("2006-01-02T15:04:05", value)
+	if err != nil {
+		return err
+	}
+	*s = SafdateTimeType(date)
+	return nil
+}
+
+type SafdateType time.Time
+
+func (s SafdateType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	value := time.Time(s).Format("2006-01-02")
+	return e.EncodeElement(value, start)
+}
+
+func (s *SafdateType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var value string
+	if err := d.DecodeElement(&value, &start); err != nil {
+		return err
+	}
+	date, err := time.Parse("2006-01-02", value)
+	if err != nil {
+		return err
+	}
+	*s = SafdateType(date)
+	return nil
+}
 
 type SafdecimalType decimal.Decimal
 
@@ -2086,7 +2123,25 @@ type SafptaccountingPeriod uint64
 
 type Safptcncode string
 
-type SafptdateSpan string
+type SafptdateSpan time.Time
+
+func (s SafptdateSpan) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	value := time.Time(s).Format("2006-01-02")
+	return e.EncodeElement(value, start)
+}
+
+func (s *SafptdateSpan) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var value string
+	if err := d.DecodeElement(&value, &start); err != nil {
+		return err
+	}
+	date, err := time.Parse("2006-01-02", value)
+	if err != nil {
+		return err
+	}
+	*s = SafptdateSpan(date)
+	return nil
+}
 
 type SaftptdocArchivalNumber string
 
@@ -2176,3 +2231,15 @@ type TaxTableEntryTaxCode string
 
 const CashVatschemeIndicatorYes uint = 1
 const CashVatschemeIndicatorNo uint = 0
+
+// Saft types
+const (
+	SaftAccounting            = "C"
+	SaftInvoicingThirdParties = "E"
+	SaftInvoicing             = "F"
+	SaftIntegrated            = "I"
+	SaftInvoicingParcial      = "P"
+	SaftPayments              = "R"
+	SaftSelfBilling           = "S"
+	SaftTransportDocuments    = "T"
+)

@@ -24,7 +24,7 @@ func main() {
 
 	// Print the XML
 	fmt.Println("------------------------------------")
-	//fmt.Println(xml)
+	fmt.Println(xml)
 
 	// export to a file
 	os.WriteFile("saf-t-export.xml", []byte(xml), 0644)
