@@ -1,6 +1,7 @@
 package saft
 
 import (
+	"errors"
 	"regexp"
 	"strconv"
 	"time"
@@ -65,6 +66,11 @@ func (a *AuditFile) checkCommon() error {
 	if err := a.checkHeader(); err != nil {
 		return err
 	}
+
+	if err := a.checkCustomers(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -85,6 +91,7 @@ func (a *AuditFile) checkHeader() error {
 	taxNumber := strconv.FormatUint(uint64(a.Header.TaxRegistrationNumber), 10)
 	ok := common.ValidateNIFPT(taxNumber)
 	if !ok {
+		// TODO: ADD ERROR
 		return common.ErrInvalidNIFPT
 	}
 
@@ -165,11 +172,13 @@ func (a *AuditFile) checkHeader() error {
 	}
 
 	if len(a.Header.ProductCompanyTaxId) != 9 {
+		// TODO: ADD ERROR
 		return common.ErrInvalidNIFPT
 	}
 
 	ok = common.ValidateNIFPT(string(a.Header.ProductCompanyTaxId))
 	if !ok {
+		// TODO: ADD ERROR
 		return common.ErrInvalidNIFPT
 	}
 
@@ -182,6 +191,77 @@ func (a *AuditFile) checkHeader() error {
 
 	if a.Header.ProductVersion == "" {
 		return errcodes.ErrMissingProductVersion
+	}
+
+	return nil
+}
+
+func (a *AuditFile) checkCustomers() error {
+	for _, customer := range a.MasterFiles.Customer {
+		if customer.CustomerId == "" {
+			return errcodes.ErrMissingCustomerID
+		}
+
+		if customer.AccountId == "" {
+			return errcodes.ErrMissingAccountID
+		}
+
+		if customer.CustomerTaxId == "" {
+			return errcodes.ErrMissingCustomerTaxID
+		}
+
+		if customer.CompanyName == "" {
+			return errcodes.ErrMissingCompanyName
+		}
+
+		if customer.BillingAddress == (CustomerAddressStructure{}) {
+			return errcodes.ErrMissingBillingAddress
+		}
+
+		if customer.BillingAddress.AddressDetail == "" {
+			return errcodes.ErrMissingAddressDetail
+		}
+
+		if customer.BillingAddress.City == "" {
+			return errcodes.ErrMissingCity
+		}
+
+		if customer.BillingAddress.PostalCode == "" {
+			return errcodes.ErrMissingPostalCode
+		}
+
+		if customer.BillingAddress.Country == "" {
+			return errcodes.ErrMissingCountry
+		}
+
+		if len(customer.CustomerTaxId) == 9 && customer.BillingAddress.Country == "PT" {
+			ok := common.ValidateNIFPT(string(customer.CustomerTaxId))
+			if !ok {
+				return errors.Join(errcodes.ErrInvalidCustomerTaxID, common.ErrInvalidNIFPT)
+			}
+		}
+
+		for _, shipTo := range customer.ShipToAddress {
+			if shipTo.AddressDetail == "" {
+				return errcodes.ErrMissingAddressDetail
+			}
+
+			if shipTo.City == "" {
+				return errcodes.ErrMissingCity
+			}
+
+			if shipTo.PostalCode == "" {
+				return errcodes.ErrMissingPostalCode
+			}
+
+			if shipTo.Country == "" {
+				return errcodes.ErrMissingCountry
+			}
+		}
+
+		if customer.SelfBillingIndicator != SelfBillingIndicatorNo && customer.SelfBillingIndicator != SelfBillingIndicatorYes {
+			return errcodes.ErrInvalidSelfBillingIndicator
+		}
 	}
 
 	return nil

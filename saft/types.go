@@ -110,7 +110,7 @@ type Customer struct {
 
 	Website *SafpttextTypeMandatoryMax60Car `xml:"Website"`
 
-	SelfBillingIndicator string `xml:"SelfBillingIndicator"`
+	SelfBillingIndicator uint64 `xml:"SelfBillingIndicator"`
 }
 
 // Element
@@ -2250,3 +2250,6 @@ const (
 	SaftSelfBilling           = "S"
 	SaftTransportDocuments    = "T"
 )
+
+const SelfBillingIndicatorNo = 0
+const SelfBillingIndicatorYes = 1

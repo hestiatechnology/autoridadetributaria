@@ -60,3 +60,18 @@ var (
 	ErrInvalidProductId           = errors.New("saft: product id is invalid")
 	ErrMissingProductVersion      = errors.New("saft: product version is missing")
 )
+
+// Customer Errors
+var (
+	ErrMissingCustomerID           = errors.New("saft: customer id is missing, muste be Desconhecido or a string")
+	ErrMissingAccountID            = errors.New("missing account ID")
+	ErrMissingCustomerTaxID        = errors.New("missing customer tax ID")
+	ErrInvalidCustomerTaxID        = errors.New("invalid customer tax ID")
+	ErrMissingCompanyName          = errors.New("missing company name")
+	ErrMissingBillingAddress       = errors.New("missing billing address")
+	ErrMissingAddressDetail        = errors.New("missing address detail")
+	ErrMissingCity                 = errors.New("missing city")
+	ErrMissingPostalCode           = errors.New("missing postal code")
+	ErrMissingCountry              = errors.New("missing country")
+	ErrInvalidSelfBillingIndicator = errors.New("invalid self-billing indicator")
+)
