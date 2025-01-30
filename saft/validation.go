@@ -357,110 +357,86 @@ func (a *AuditFile) checkConstraints() error {
 
 	// General Ledger Constraints
 	if a.MasterFiles.GeneralLedgerAccounts != nil {
-		// AccountIDConstraint
+
 		accounts := make(map[SafptglaccountId]bool)
 		for _, account := range a.MasterFiles.GeneralLedgerAccounts.Account {
+			// AccountIDConstraint
 			if _, ok := accounts[account.AccountId]; ok {
 				return errcodes.ErrUQAccountId
 			}
 			accounts[account.AccountId] = true
-		}
 
-		// GroupingCodeConstraint
-		for _, account := range a.MasterFiles.GeneralLedgerAccounts.Account {
+			// GroupingCodeConstraint
 			if account.GroupingCode != nil && *account.GroupingCode != "" {
-				if _, ok := accounts[SafptglaccountId(*account.GroupingCode)]; !ok {
+				if _, ok := accounts[*account.GroupingCode]; !ok {
 					return errcodes.ErrKRGenLedgerEntriesAccountID
 				}
 			}
 		}
 
-		// GeneralLedgerEntriesDebitLineAccountIDConstraint
+		journals := make(map[SafptjournalId]bool)
+		transactions := make(map[SafpttransactionId]bool)
 		for _, entry := range a.GeneralLedgerEntries.Journal {
+			// GeneralLedgerEntriesJournalIdConstraint
+			if _, ok := journals[entry.JournalId]; ok {
+				return errcodes.ErrUQJournalId
+			}
+			journals[entry.JournalId] = true
+
 			for _, line := range entry.Transaction {
+				// GeneralLedgerEntriesDebitLineAccountIDConstraint
 				for _, debit := range line.Lines.DebitLine {
 					if _, ok := accounts[debit.AccountId]; !ok {
 						return errcodes.ErrKRGenLedgerEntriesAccountID
 					}
 				}
-			}
-		}
 
-		// GeneralLedgerEntriesCreditLineAccountIDConstraint
-		for _, entry := range a.GeneralLedgerEntries.Journal {
-			for _, line := range entry.Transaction {
+				// GeneralLedgerEntriesCreditLineAccountIDConstraint
 				for _, credit := range line.Lines.CreditLine {
 					if _, ok := accounts[credit.AccountId]; !ok {
 						return errcodes.ErrKRGenLedgerEntriesAccountID
 					}
 				}
-			}
-		}
 
-		// GeneralLedgerEntriesCustomerIDConstraint
-		for _, entry := range a.GeneralLedgerEntries.Journal {
-			for _, line := range entry.Transaction {
+				// GeneralLedgerEntriesCustomerIDConstraint
 				if line.CustomerId != nil && *line.CustomerId != "" {
 					if _, ok := customers[*line.CustomerId]; !ok {
 						return errcodes.ErrKRGenLedgerEntriesCustomerID
 					}
 				}
-			}
-		}
 
-		// GeneralLedgerEntriesJournalIdConstraint
-		journals := make(map[SafptjournalId]bool)
-		for _, entry := range a.GeneralLedgerEntries.Journal {
-			if _, ok := journals[entry.JournalId]; ok {
-				return errcodes.ErrUQJournalId
-			}
-			journals[entry.JournalId] = true
-		}
-
-		// GeneralLedgerEntriesSupplierIDConstraint
-		for _, entry := range a.GeneralLedgerEntries.Journal {
-			for _, line := range entry.Transaction {
+				// GeneralLedgerEntriesSupplierIDConstraint
 				if line.SupplierId != nil && *line.SupplierId != "" {
 					if _, ok := suppliers[*line.SupplierId]; !ok {
 						return errcodes.ErrKRGenLedgerEntriesSupplierID
 					}
 				}
-			}
-		}
 
-		// GeneralLedgerEntriesTransactionIdConstraint
-		transactions := make(map[SafpttransactionId]bool)
-		for _, entry := range a.GeneralLedgerEntries.Journal {
-			for _, line := range entry.Transaction {
+				// GeneralLedgerEntriesTransactionIdConstraint
 				if _, ok := transactions[line.TransactionId]; ok {
 					return errcodes.ErrUQTransactionId
 				}
 				transactions[line.TransactionId] = true
 			}
 		}
-
 	}
 
 	// Sales Invoices constraints
 	if a.SourceDocuments != nil && a.SourceDocuments.SalesInvoices != nil {
-		// InvoiceNoConstraint
 		invoices := make(map[string]bool)
 		for _, invoice := range a.SourceDocuments.SalesInvoices.Invoice {
+			// InvoiceNoConstraint
 			if _, ok := invoices[invoice.InvoiceNo]; ok {
 				return errcodes.ErrUQInvoiceNo
 			}
 			invoices[invoice.InvoiceNo] = true
-		}
 
-		// InvoiceCustomerIDConstraint
-		for _, invoice := range a.SourceDocuments.SalesInvoices.Invoice {
+			// InvoiceCustomerIDConstraint
 			if _, ok := customers[invoice.CustomerId]; !ok {
 				return errcodes.ErrKRInvoiceCustomerID
 			}
-		}
 
-		// InvoiceProductCodeConstraint
-		for _, invoice := range a.SourceDocuments.SalesInvoices.Invoice {
+			// InvoiceProductCodeConstraint
 			for _, line := range invoice.Line {
 				if _, ok := products[line.ProductCode]; !ok {
 					return errcodes.ErrKRInvoiceProductCode
@@ -470,31 +446,26 @@ func (a *AuditFile) checkConstraints() error {
 	}
 
 	if a.SourceDocuments != nil && a.SourceDocuments.MovementOfGoods != nil {
-		// DocumentNumberConstraint
+
 		documents := make(map[string]bool)
 		for _, stock := range a.SourceDocuments.MovementOfGoods.StockMovement {
+			// DocumentNumberConstraint
 			if _, ok := documents[stock.DocumentNumber]; !ok {
 				return errcodes.ErrUQDocumentNo
 			}
 			documents[stock.DocumentNumber] = true
-		}
 
-		// StockMovementCustomerIDConstraint
-		for _, stock := range a.SourceDocuments.MovementOfGoods.StockMovement {
+			// StockMovementCustomerIDConstraint
 			if _, ok := customers[*stock.CustomerId]; !ok {
 				return errcodes.ErrKRStockMovementCustomerID
 			}
-		}
 
-		// StockMovementSupplierIDConstraint
-		for _, stock := range a.SourceDocuments.MovementOfGoods.StockMovement {
+			// StockMovementSupplierIDConstraint
 			if _, ok := suppliers[*stock.SupplierId]; !ok {
 				return errcodes.ErrKRStockMovementSupplierID
 			}
-		}
 
-		// StockMovementProductCodeConstraint
-		for _, stock := range a.SourceDocuments.MovementOfGoods.StockMovement {
+			// StockMovementProductCodeConstraint
 			for _, line := range stock.Line {
 				if _, ok := products[line.ProductCode]; !ok {
 					return errcodes.ErrKRStockMovementProductCode
@@ -504,24 +475,20 @@ func (a *AuditFile) checkConstraints() error {
 	}
 
 	if a.SourceDocuments != nil && a.SourceDocuments.WorkingDocuments != nil {
-		// WorkDocumentDocumentNumberConstraint
 		workDocs := make(map[string]bool)
 		for _, workDoc := range a.SourceDocuments.WorkingDocuments.WorkDocument {
+			// WorkDocumentDocumentNumberConstraint
 			if _, ok := workDocs[workDoc.DocumentNumber]; !ok {
 				return errcodes.ErrUQWorkDocNo
 			}
 			workDocs[workDoc.DocumentNumber] = true
-		}
 
-		// WorkDocumentDocumentCustomerIDConstraint
-		for _, workDoc := range a.SourceDocuments.WorkingDocuments.WorkDocument {
+			// WorkDocumentDocumentCustomerIDConstraint
 			if _, ok := customers[workDoc.CustomerId]; !ok {
 				return errcodes.ErrKRWorkDocumentCustomerID
 			}
-		}
 
-		// WorkDocumentDocumentProductCodeConstraint
-		for _, workDoc := range a.SourceDocuments.WorkingDocuments.WorkDocument {
+			// WorkDocumentDocumentProductCodeConstraint
 			for _, line := range workDoc.Line {
 				if _, ok := products[line.ProductCode]; !ok {
 					return errcodes.ErrKRWorkDocumentProductCode
@@ -531,17 +498,16 @@ func (a *AuditFile) checkConstraints() error {
 	}
 
 	if a.SourceDocuments != nil && a.SourceDocuments.Payments != nil {
-		// PaymentPaymentRefNoConstraint
 		payments := make(map[string]bool)
 		for _, payment := range a.SourceDocuments.Payments.Payment {
+			// PaymentPaymentRefNoConstraint
+
 			if _, ok := payments[payment.PaymentRefNo]; ok {
 				return errcodes.ErrUQPaymentRefNo
 			}
 			payments[payment.PaymentRefNo] = true
-		}
 
-		// PaymentPaymentRefNoCustomerIDConstraint
-		for _, payment := range a.SourceDocuments.Payments.Payment {
+			// PaymentPaymentRefNoCustomerIDConstraint
 			if _, ok := customers[payment.CustomerId]; !ok {
 				return errcodes.ErrKRStockMovementCustomerID
 			}
