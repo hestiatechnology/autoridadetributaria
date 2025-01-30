@@ -8,6 +8,7 @@ import (
 
 	"github.com/hestiatechnology/autoridadetributaria/common"
 	"github.com/hestiatechnology/autoridadetributaria/saft/errcodes"
+	"github.com/shopspring/decimal"
 )
 
 func (a *AuditFile) Validate() error {
@@ -51,7 +52,7 @@ func (a *AuditFile) Validate() error {
 		}
 	}
 
-	if err := a.CheckConstraints(); err != nil {
+	if err := a.checkConstraints(); err != nil {
 		return err
 	}
 	return nil
@@ -71,6 +72,11 @@ func (a *AuditFile) checkCommon() error {
 		return err
 	}
 
+	// TODO: Check TaxTable
+
+	if err := a.checkPayments(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -267,7 +273,60 @@ func (a *AuditFile) checkCustomers() error {
 	return nil
 }
 
-func (a *AuditFile) CheckConstraints() error {
+func (a *AuditFile) checkPayments() error {
+	if a.SourceDocuments == nil && a.SourceDocuments.Payments == nil {
+		return nil
+	}
+
+	// Calculate the number of registered payments, total debits and total credits
+	numPayments := uint64(0)
+	var totalDebit, totalCredit decimal.Decimal
+	for _, payment := range a.SourceDocuments.Payments.Payment {
+		numPayments++
+		for _, line := range payment.Line {
+			// Can't have both debit and credit
+			if line.DebitAmount != nil && line.CreditAmount != nil {
+				return errcodes.ErrDebitCreditAmount
+			}
+
+			if line.DebitAmount != nil {
+				amount := decimal.Decimal(*line.DebitAmount)
+				totalDebit = totalDebit.Add(amount)
+			}
+
+			if line.CreditAmount != nil {
+				amount := decimal.Decimal(*line.CreditAmount)
+				totalCredit = totalCredit.Add(amount)
+			}
+		}
+	}
+
+	// Check if the total debit and total credit are the same
+	if a.SourceDocuments.Payments.NumberOfEntries != numPayments {
+		return errcodes.ErrPaymentNumberOfEntries
+	}
+
+	if a.SourceDocuments.Payments.TotalCredit != SafmonetaryType(totalCredit) {
+		return errcodes.ErrPaymentTotalCredit
+	}
+
+	if a.SourceDocuments.Payments.TotalDebit != SafmonetaryType(totalDebit) {
+		return errcodes.ErrPaymentTotalDebit
+	}
+
+	/* 	for _, payment := range a.SourceDocuments.Payments.Payment {
+		if payment.PaymentRefNo == "" {
+			return errcodes.ErrMissingPaymentRefNo
+		}
+
+		if payment.PaymentRefNo == "" {
+			return errcodes.ErrMissingPaymentRefNo
+		}
+	} */
+	return nil
+}
+
+func (a *AuditFile) checkConstraints() error {
 	// Master Files Constraints
 	// CustomerIDConstraint
 	customers := make(map[SafpttextTypeMandatoryMax30Car]bool)

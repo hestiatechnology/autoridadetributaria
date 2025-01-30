@@ -75,3 +75,11 @@ var (
 	ErrMissingCountry              = errors.New("missing country")
 	ErrInvalidSelfBillingIndicator = errors.New("invalid self-billing indicator")
 )
+
+// Payment Errors
+var (
+	ErrDebitCreditAmount      = errors.New("saft: cannot have both debit and credit amount")
+	ErrPaymentNumberOfEntries = errors.New("saft: wrong number of entries in payment")
+	ErrPaymentTotalCredit     = errors.New("saft: total credit amount does not match")
+	ErrPaymentTotalDebit      = errors.New("saft: total debit amount does not match")
+)
