@@ -282,6 +282,10 @@ func (a *AuditFile) checkPayments() error {
 	numPayments := uint64(0)
 	var totalDebit, totalCredit decimal.Decimal
 	for _, payment := range a.SourceDocuments.Payments.Payment {
+		if len(payment.Line) == 0 {
+			return errcodes.ErrMissingPaymentLine
+		}
+
 		numPayments++
 		for _, line := range payment.Line {
 			// Can't have both debit and credit
@@ -314,15 +318,66 @@ func (a *AuditFile) checkPayments() error {
 		return errcodes.ErrPaymentTotalDebit
 	}
 
-	/* 	for _, payment := range a.SourceDocuments.Payments.Payment {
+	for _, payment := range a.SourceDocuments.Payments.Payment {
 		if payment.PaymentRefNo == "" {
 			return errcodes.ErrMissingPaymentRefNo
 		}
 
-		if payment.PaymentRefNo == "" {
-			return errcodes.ErrMissingPaymentRefNo
+		if payment.Atcud == "" {
+			return errcodes.ErrMissingPaymentATCUD
 		}
-	} */
+
+		// TODO: Validate ATCUD?
+
+		// Transaction Id validation is done in the constraints
+
+		if payment.TransactionDate == (SafdateType{}) {
+			return errcodes.ErrMissingPaymentTransactionDate
+		}
+
+		if time.Time(payment.TransactionDate).After(time.Now()) {
+			return errcodes.ErrInvalidPaymentTransactionDate
+		}
+
+		if payment.PaymentType != SaftptpaymentTypeRC && payment.PaymentType != SaftptpaymentTypeRG {
+			return errcodes.ErrInvalidPaymentType
+		}
+
+		if payment.DocumentStatus == (PaymentDocumentStatus{}) {
+			return errcodes.ErrMissingPaymentDocumentStatus
+		}
+
+		if payment.DocumentStatus.PaymentStatus != PaymentStatusNormal && payment.DocumentStatus.PaymentStatus != PaymentStatusCancelled {
+			return errcodes.ErrInvalidPaymentStatus
+		}
+
+		if payment.DocumentStatus.PaymentStatusDate == (SafdateTimeType{}) {
+			return errcodes.ErrMissingPaymentDocumentStatusDate
+		}
+
+		if time.Time(payment.DocumentStatus.PaymentStatusDate).After(time.Now()) {
+			return errcodes.ErrInvalidPaymentDocumentStatusDate
+		}
+
+		if payment.DocumentStatus.SourceId == "" {
+			return errcodes.ErrMissingPaymentDocumentStatusSourceId
+		}
+
+		if payment.DocumentStatus.SourcePayment != SaftptsourcePaymentP &&
+			payment.DocumentStatus.SourcePayment != SaftptsourcePaymentI &&
+			payment.DocumentStatus.SourcePayment != SaftptsourcePaymentM {
+			return errcodes.ErrInvalidPaymentDocumentStatusSourcePayment
+		}
+
+		if len(payment.PaymentMethod) == 0 {
+			return errcodes.ErrMissingPaymentMethod
+		}
+
+		/* 		for _, method := range payment.PaymentMethod {
+
+		   		} */
+
+	}
 	return nil
 }
 
@@ -356,8 +411,8 @@ func (a *AuditFile) checkConstraints() error {
 	}
 
 	// General Ledger Constraints
+	transactions := make(map[SafpttransactionId]bool)
 	if a.MasterFiles.GeneralLedgerAccounts != nil {
-
 		accounts := make(map[SafptglaccountId]bool)
 		for _, account := range a.MasterFiles.GeneralLedgerAccounts.Account {
 			// AccountIDConstraint
@@ -375,7 +430,6 @@ func (a *AuditFile) checkConstraints() error {
 		}
 
 		journals := make(map[SafptjournalId]bool)
-		transactions := make(map[SafpttransactionId]bool)
 		for _, entry := range a.GeneralLedgerEntries.Journal {
 			// GeneralLedgerEntriesJournalIdConstraint
 			if _, ok := journals[entry.JournalId]; ok {
@@ -446,7 +500,6 @@ func (a *AuditFile) checkConstraints() error {
 	}
 
 	if a.SourceDocuments != nil && a.SourceDocuments.MovementOfGoods != nil {
-
 		documents := make(map[string]bool)
 		for _, stock := range a.SourceDocuments.MovementOfGoods.StockMovement {
 			// DocumentNumberConstraint
@@ -510,6 +563,17 @@ func (a *AuditFile) checkConstraints() error {
 			// PaymentPaymentRefNoCustomerIDConstraint
 			if _, ok := customers[payment.CustomerId]; !ok {
 				return errcodes.ErrKRStockMovementCustomerID
+			}
+
+			// Check TransactionId against GeneralLedgerEntries
+			// Not an official constraint
+			if payment.TransactionId != nil && *payment.TransactionId != "" {
+				if len(transactions) != 0 {
+					if _, ok := transactions[*payment.TransactionId]; !ok {
+						return errcodes.ErrKRPaymentTransactionId
+					}
+				}
+
 			}
 		}
 	}

@@ -2168,9 +2168,9 @@ const SaftptmovementTaxTypeNs SaftptmovementTaxType = "NS"
 
 type SaftptpaymentType string
 
-const SaftptpaymentTypeRc SaftptpaymentType = "RC"
+const SaftptpaymentTypeRC SaftptpaymentType = "RC"
 
-const SaftptpaymentTypeRg SaftptpaymentType = "RG"
+const SaftptpaymentTypeRG SaftptpaymentType = "RG"
 
 type SafptportugueseTaxExemptionCode string
 
@@ -2253,3 +2253,6 @@ const (
 
 const SelfBillingIndicatorNo = 0
 const SelfBillingIndicatorYes = 1
+
+const PaymentStatusNormal = "N"
+const PaymentStatusCancelled = "A"
