@@ -2254,5 +2254,38 @@ const (
 const SelfBillingIndicatorNo = 0
 const SelfBillingIndicatorYes = 1
 
-const PaymentStatusNormal = "N"
-const PaymentStatusCancelled = "A"
+const (
+	PaymentStatusNormal    = "N"
+	PaymentStatusCancelled = "A"
+)
+
+const (
+	// Credit Card
+	PaymentMechanismCC = "CC"
+	// Debit Card
+	PaymentMechanismCD = "CD"
+	// Bank check
+	PaymentMechanismCH = "CH"
+	// Documentary Credit (Letter of Credit)
+	PaymentMechanismCI = "CI"
+	// Check or Gift Card
+	PaymentMechanismCO = "CO"
+	// Compensation of current account balances;
+	PaymentMechanismCS = "CS"
+	// Electronic Money, like fidelity card, points, etc...
+	PaymentMechanismDE = "DE"
+	// Comercial Letter
+	PaymentMechanismLC = "LC"
+	// Multibanco Reference
+	PaymentMechanismMB = "MB"
+	// Physical cash
+	PaymentMechanismNU = "NU"
+	// Other
+	PaymentMechanismOU = "OU"
+	// Exchange of goods
+	PaymentMechanismPR = "PR"
+	// Bank Transfer or Direct Debit
+	PaymentMechanismTB = "TB"
+	// Salary extracompensation, like meal tickets
+	PaymentMechanismTR = "TR"
+)

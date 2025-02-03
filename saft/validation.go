@@ -373,10 +373,61 @@ func (a *AuditFile) checkPayments() error {
 			return errcodes.ErrMissingPaymentMethod
 		}
 
-		/* 		for _, method := range payment.PaymentMethod {
+		for _, method := range payment.PaymentMethod {
+			if method.PaymentMechanism != nil {
+				switch *method.PaymentMechanism {
+				case PaymentMechanismCC, PaymentMechanismCD, PaymentMechanismCH, PaymentMechanismCI, PaymentMechanismCO, PaymentMechanismCS, PaymentMechanismDE, PaymentMechanismLC, PaymentMechanismMB, PaymentMechanismNU, PaymentMechanismOU, PaymentMechanismPR, PaymentMechanismTB, PaymentMechanismTR:
+					// Ignore
+				default:
+					return errcodes.ErrInvalidPaymentMechanism
+				}
+			}
 
-		   		} */
+			if decimal.Decimal(method.PaymentAmount).LessThan(decimal.NewFromInt(0)) {
+				return errcodes.ErrPaymentAmount
+			}
 
+			if method.PaymentDate == (SafdateType{}) {
+				return errcodes.ErrInvalidPaymentDate
+			}
+
+			if time.Time(method.PaymentDate).After(time.Now()) {
+				return errcodes.ErrInvalidPaymentDate
+			}
+
+			if payment.SourceId == "" {
+				return errcodes.ErrMissingPaymentSourceId
+			}
+
+			if payment.CustomerId == "" {
+				return errcodes.ErrMissingPaymentCustomerID
+			}
+
+			for _, line := range payment.Line {
+				// LineNumber can be 0 I guess
+
+				if len(line.SourceDocumentId) == 0 {
+					return errcodes.ErrPaymentLineSourceDocumentId
+				}
+				for _, sourceDocument := range line.SourceDocumentId {
+					if sourceDocument.OriginatingOn == "" {
+						return errcodes.ErrPaymentLineSourceDocumentIdOriginatingOn
+					}
+				}
+
+				if line.DebitAmount != nil {
+					if decimal.Decimal(*line.DebitAmount).LessThan(decimal.NewFromInt(0)) {
+						return errcodes.ErrPaymentAmount
+					}
+				}
+
+				if line.CreditAmount != nil {
+					if decimal.Decimal(*line.CreditAmount).LessThan(decimal.NewFromInt(0)) {
+						return errcodes.ErrPaymentAmount
+					}
+				}
+			}
+		}
 	}
 	return nil
 }
