@@ -3,6 +3,7 @@ package saft
 import (
 	"errors"
 	"regexp"
+	"slices"
 	"strconv"
 	"time"
 
@@ -426,6 +427,66 @@ func (a *AuditFile) checkPayments() error {
 						return errcodes.ErrPaymentAmount
 					}
 				}
+
+				// If PaymentType is RC, then Tax must be present
+				if payment.PaymentType == SaftptpaymentTypeRC && line.Tax == nil {
+					return errcodes.ErrPaymentLineTax
+				}
+
+				// If PaymentType is RG, then Tax must not be present
+				if payment.PaymentType == SaftptpaymentTypeRG && line.Tax != nil {
+					return errcodes.ErrPaymentLineTax
+				}
+
+				if line.Tax != nil {
+					if line.Tax.TaxType != TaxTypeIVA && line.Tax.TaxType != TaxTypeIS && line.Tax.TaxType != TaxTypeNS {
+						return errcodes.ErrPaymentLineTaxType
+					}
+
+					// Check if its a ISO 3166-1 alpha-2 country code + PT regions
+					if slices.Contains(common.CountryCodesPTRegions, line.Tax.TaxCountryRegion) {
+						return errcodes.ErrPaymentLineTaxCountryRegion
+					}
+
+					// Cant have both TaxPercentage and TaxAmount
+					if line.Tax.TaxPercentage != nil && line.Tax.TaxAmount != nil {
+						return errcodes.ErrPaymentLineTaxPercentageAmount
+					}
+
+					// TaxPercentage can only be zero if TaxCode is Ise or Na
+					if line.Tax.TaxPercentage != nil &&
+						decimal.Decimal(*line.Tax.TaxPercentage) == decimal.NewFromInt(0) &&
+						(line.Tax.TaxCode != PaymentTaxCode(TaxCodeIse) && line.Tax.TaxCode != PaymentTaxCode(TaxCodeNa)) {
+						return errcodes.ErrPaymentLineTaxPercentage
+					}
+
+					// TaxPercentage must be 0 or greater
+					if line.Tax.TaxPercentage != nil && decimal.Decimal(*line.Tax.TaxPercentage).LessThan(decimal.NewFromInt(0)) {
+						return errcodes.ErrPaymentLineTaxPercentage
+					}
+
+					// TaxAmount can only appear if TaxType is IS
+					if line.Tax.TaxAmount != nil && line.Tax.TaxType != TaxTypeIS {
+						return errcodes.ErrPaymentLineTaxAmount
+					}
+
+					if decimal.Decimal(*line.Tax.TaxAmount).LessThan(decimal.NewFromInt(0)) {
+						return errcodes.ErrPaymentLineTaxAmount
+					}
+				}
+
+				//// Cant have Tax and TaxExemptionReason and TaxExemptionCode
+				//if line.Tax != nil && line.TaxExemptionReason != nil && line.TaxExemptionCode != nil {
+				//	return errcodes.ErrPaymentLineTaxTaxExemption
+				//}
+
+				// TaxExemptionReason and TaxExemptionCode must exist when TaxPercentage/TaxAmount is 0
+				if line.Tax != nil && line.Tax.TaxPercentage != nil && decimal.Decimal(*line.Tax.TaxPercentage) == decimal.NewFromInt(0) {
+					if line.TaxExemptionReason == nil || line.TaxExemptionCode == nil {
+						return errcodes.ErrPaymentLineTaxTaxExemption
+					}
+				}
+
 			}
 		}
 	}

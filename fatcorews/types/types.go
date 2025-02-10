@@ -652,7 +652,7 @@ type TaxExemptionCode string
 
 func NewTaxExemptionCode(value string) TaxExemptionCode {
 	for _, code := range common.VatExemptionCodes {
-		if value == code {
+		if value == code.Code {
 			return TaxExemptionCode(value)
 		}
 	}

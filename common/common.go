@@ -33,11 +33,44 @@ var CountryCodes = []string{
 	"VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW",
 }
 
-var VatExemptionCodes = []string{
-	"M01", "M02", "M04", "M05", "M06", "M07", "M09", "M10",
-	"M11", "M12", "M13", "M14", "M15", "M16", "M19", "M20",
-	"M21", "M25", "M26", "M30", "M31", "M32", "M33", "M34",
-	"M40", "M41", "M42", "M43",
+var CountryCodesPTRegions = append(append(CountryCodes, "PT-AC"), "PT-MA")
+
+type VatExemptionCode struct {
+	Code        string
+	Description string
+	Law         string
+}
+
+var VatExemptionCodes = []VatExemptionCode{
+	{Code: "M01", Description: "Artigo 16.º, n.º 6 do CIVA", Law: "Artigo 16.º, n.º 6, alíneas a) a d) do CIVA"},
+	{Code: "M02", Description: "Artigo 6.º do Decreto-Lei n.º 198/90, de 19 dejunho", Law: "Artigo 6.º do Decreto‐Lei n.º 198/90, de 19 de junho"},
+	{Code: "M04", Description: "Isento artigo 13.º do CIVA", Law: "Artigo 13.º do CIVA"},
+	{Code: "M05", Description: "Isento artigo 14.º do CIVA", Law: "Artigo 14.º do CIVA"},
+	{Code: "M06", Description: "Isento artigo 15.º do CIVA", Law: "Artigo 15.º do CIVA"},
+	{Code: "M07", Description: "Isento artigo 9.º do CIVA", Law: "Artigo 9.º do CIVA"},
+	{Code: "M09", Description: "IVA - não confere direito a dedução", Law: "Artigo 62.º alínea b) do CIVA"},
+	{Code: "M10", Description: "IVA – regime de isenção", Law: "Artigo 57.º do CIVA"},
+	{Code: "M11", Description: "Regime particular do tabaco", Law: "Decreto-Lei n.º 346/85, de 23 de agosto"},
+	{Code: "M12", Description: "Regime da margem de lucro – Agências de viagens", Law: "Decreto-Lei n.º 221/85, de 3 de julho"},
+	{Code: "M13", Description: "Regime da margem de lucro – Bens em segunda mão", Law: "Decreto-Lei n.º 199/96, de 18 de outubro"},
+	{Code: "M14", Description: "Regime da margem de lucro – Objetos de arte", Law: "Decreto-Lei n.º 199/96, de 18 de outubro"},
+	{Code: "M15", Description: "Regime da margem de lucro – Objetos de coleção e antiguidades", Law: "Decreto-Lei n.º 199/96, de 18 de outubro"},
+	{Code: "M16", Description: "Isento artigo 14.º do RITI", Law: "Artigo 14.º do RITI"},
+	{Code: "M19", Description: "Outras isenções", Law: "Isenções temporárias determinadas em diploma próprio"},
+	{Code: "M20", Description: "IVA - regime forfetário", Law: "Artigo 59.º-D n.º2 do CIVA"},
+	{Code: "M21", Description: "IVA – não confere direito à dedução (ou expressão similar)", Law: "Artigo 72.º n.º 4 do CIVA"},
+	{Code: "M25", Description: "Mercadorias à consignação", Law: "Artigo 38.º n.º 1 alínea a) do CIVA"},
+	{Code: "M26", Description: "Isenção de IVA com direito à dedução no cabaz alimentar", Law: "Lei n.º 17/2023, de 14 de abril"},
+	{Code: "M30", Description: "IVA - autoliquidação", Law: "Artigo 2.º n.º 1 alínea i) do CIVA"},
+	{Code: "M31", Description: "IVA - autoliquidação", Law: "Artigo 2.º n.º 1 alínea j) do CIVA"},
+	{Code: "M32", Description: "IVA - autoliquidação", Law: "Artigo 2.º n.º 1 alínea l) do CIVA"},
+	{Code: "M33", Description: "IVA - autoliquidação", Law: "Artigo 2.º n.º 1 alínea m) do CIVA"},
+	{Code: "M34", Description: "IVA - autoliquidação", Law: "Artigo 2.º n.º 1 alínea n) do CIVA"},
+	{Code: "M40", Description: "IVA - autoliquidação", Law: "Artigo 6.º n.º 6 alínea a) do CIVA, a contrário"},
+	{Code: "M41", Description: "IVA - autoliquidação", Law: "Artigo 8.º n.º 3 do RITI"},
+	{Code: "M42", Description: "IVA - autoliquidação", Law: "Decreto-Lei n.º 21/2007, de 29 de janeiro"},
+	{Code: "M43", Description: "IVA - autoliquidação", Law: "Decreto-Lei n.º 362/99, de 16 de setembro"},
+	{Code: "M99", Description: "Não sujeito ou não tributado", Law: "Outras situações de não liquidação do imposto (Exemplos: artigo 2.º, n.º 2 ; artigo 3.º, n.ºs 4, 6 e 7; artigo 4.º, n.º 5, todos do CIVA)"},
 }
 
 func ValidateNIFPT(nif string) bool {

@@ -2162,15 +2162,18 @@ type SaftptmovementTaxCode string
 
 type SaftptmovementTaxType string
 
-const SaftptmovementTaxTypeIva SaftptmovementTaxType = "IVA"
-
-const SaftptmovementTaxTypeNs SaftptmovementTaxType = "NS"
+const (
+	TaxTypeIVA string = "IVA"
+	TaxTypeIS  string = "IS"
+	TaxTypeNS  string = "NS"
+)
 
 type SaftptpaymentType string
 
-const SaftptpaymentTypeRC SaftptpaymentType = "RC"
-
-const SaftptpaymentTypeRG SaftptpaymentType = "RG"
+const (
+	SaftptpaymentTypeRC SaftptpaymentType = "RC"
+	SaftptpaymentTypeRG SaftptpaymentType = "RG"
+)
 
 type SafptportugueseTaxExemptionCode string
 
@@ -2184,19 +2187,19 @@ type SafptproductId string
 
 type SaftptsourceBilling string
 
-const SaftptsourceBillingP SaftptsourceBilling = "P"
-
-const SaftptsourceBillingI SaftptsourceBilling = "I"
-
-const SaftptsourceBillingM SaftptsourceBilling = "M"
+const (
+	SaftptsourceBillingP SaftptsourceBilling = "P"
+	SaftptsourceBillingI SaftptsourceBilling = "I"
+	SaftptsourceBillingM SaftptsourceBilling = "M"
+)
 
 type SaftptsourcePayment string
 
-const SaftptsourcePaymentP SaftptsourcePayment = "P"
-
-const SaftptsourcePaymentI SaftptsourcePayment = "I"
-
-const SaftptsourcePaymentM SaftptsourcePayment = "M"
+const (
+	SaftptsourcePaymentP SaftptsourcePayment = "P"
+	SaftptsourcePaymentI SaftptsourcePayment = "I"
+	SaftptsourcePaymentM SaftptsourcePayment = "M"
+)
 
 type SafpttaxonomyCode uint64
 
@@ -2236,8 +2239,10 @@ type Safptunnumber string
 
 type TaxTableEntryTaxCode string
 
-const CashVatschemeIndicatorYes uint = 1
-const CashVatschemeIndicatorNo uint = 0
+const (
+	CashVatschemeIndicatorYes uint = 1
+	CashVatschemeIndicatorNo  uint = 0
+)
 
 // Saft types
 const (
@@ -2288,4 +2293,19 @@ const (
 	PaymentMechanismTB = "TB"
 	// Salary extracompensation, like meal tickets
 	PaymentMechanismTR = "TR"
+)
+
+const (
+	// Reduced
+	TaxCodeRed string = "RED"
+	// Intermediate
+	TaxCodeInt string = "INT"
+	// Normal
+	TaxCodeNor string = "NOR"
+	// Exempt
+	TaxCodeIse string = "ISE"
+	// Others
+	TaxCodeOut string = "OUT"
+	// Not Applicable
+	TaxCodeNa string = "NA"
 )
