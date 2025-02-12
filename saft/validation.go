@@ -487,8 +487,45 @@ func (a *AuditFile) checkPayments() error {
 					}
 				}
 
+				// Check if TaxExemption is valid
+				if line.TaxExemptionCode != nil && line.TaxExemptionReason != nil {
+					for _, exemption := range common.VatExemptionCodes {
+						if SafptportugueseTaxExemptionCode(exemption.Code) == *line.TaxExemptionCode && SafptportugueseTaxExemptionReason(exemption.Description) == *line.TaxExemptionReason {
+							break
+						}
+					}
+					return errcodes.ErrPaymentLineTaxTaxExemption
+				}
 			}
+
 		}
+
+		// Calculate NetTotal and GrossTotal
+		netTotal := decimal.NewFromInt(0)
+		grossTotal := decimal.NewFromInt(0)
+
+		for _, line := range payment.Line {
+			if line.DebitAmount != nil {
+				netTotal = netTotal.Add(decimal.Decimal(*line.DebitAmount))
+				//grossTotal = grossTotal.Add(decimal.Decimal(*line.DebitAmount))
+			}
+
+			if line.CreditAmount != nil {
+				netTotal = netTotal.Sub(decimal.Decimal(*line.CreditAmount))
+				//grossTotal = grossTotal.Sub(decimal.Decimal(*line.CreditAmount))
+			}
+
+			//  get the tax amount
+
+			if line.Tax != nil && line.Tax.TaxPercentage != nil {
+				taxMultiplier := decimal.Decimal(*line.Tax.TaxPercentage).Div(decimal.NewFromInt(100)).Add(decimal.NewFromInt(1))
+				grossTotal = grossTotal.Add(netTotal.Div(taxMultiplier))
+			} else if line.Tax != nil && line.Tax.TaxAmount != nil {
+				grossTotal = grossTotal.Add(netTotal.Add(decimal.Decimal(*line.Tax.TaxAmount)))
+			}
+
+		}
+
 	}
 	return nil
 }
