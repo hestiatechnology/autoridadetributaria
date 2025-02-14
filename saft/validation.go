@@ -313,11 +313,11 @@ func (a *AuditFile) checkPayments() error {
 		return fmt.Errorf("saft: invalid NumberOfEntries: %d != calculated %d", a.SourceDocuments.Payments.NumberOfEntries, numPayments)
 	}
 
-	if a.SourceDocuments.Payments.TotalCredit != SafmonetaryType(totalCredit) {
+	if decimal.Decimal(a.SourceDocuments.Payments.TotalCredit).Cmp(totalCredit) != 0 {
 		return fmt.Errorf("saft: invalid TotalCredit: %s != calculated %s", a.SourceDocuments.Payments.TotalCredit, totalCredit)
 	}
 
-	if a.SourceDocuments.Payments.TotalDebit != SafmonetaryType(totalDebit) {
+	if decimal.Decimal(a.SourceDocuments.Payments.TotalDebit).Cmp(totalDebit) != 0 {
 		return fmt.Errorf("saft: invalid TotalDebit: %s != calculated %s", a.SourceDocuments.Payments.TotalDebit, totalDebit)
 	}
 
@@ -517,6 +517,14 @@ func (a *AuditFile) checkPayments() error {
 
 		}
 
+		if payment.DocumentTotals == (PaymentDocumentTotals{}) {
+			return fmt.Errorf("saft: missing Payment.DocumentTotals")
+		}
+
+		if decimal.Decimal(payment.DocumentTotals.TaxPayable).Cmp(taxPayable) != 0 {
+			return fmt.Errorf("saft: invalid Payment.DocumentTotals.TaxPayable: %s != calculated %s", payment.DocumentTotals.GrossTotal, totalDebit)
+		}
+
 		// Calculate NetTotal and GrossTotal
 		netTotal := decimal.NewFromInt(0)
 		grossTotal := decimal.NewFromInt(0)
@@ -539,7 +547,6 @@ func (a *AuditFile) checkPayments() error {
 			} else if line.Tax != nil && line.Tax.TaxAmount != nil {
 				grossTotal = grossTotal.Add(netTotal.Add(decimal.Decimal(*line.Tax.TaxAmount)))
 			}
-
 		}
 
 	}
