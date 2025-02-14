@@ -297,13 +297,11 @@ func (a *AuditFile) checkPayments() error {
 			}
 
 			if line.DebitAmount != nil {
-				amount := decimal.Decimal(*line.DebitAmount)
-				totalDebit = totalDebit.Add(amount)
+				totalDebit = totalDebit.Add((*line.DebitAmount).Decimal)
 			}
 
 			if line.CreditAmount != nil {
-				amount := decimal.Decimal(*line.CreditAmount)
-				totalCredit = totalCredit.Add(amount)
+				totalCredit = totalCredit.Add(line.CreditAmount.Decimal)
 			}
 		}
 	}
@@ -313,11 +311,11 @@ func (a *AuditFile) checkPayments() error {
 		return fmt.Errorf("saft: invalid NumberOfEntries: %d != calculated %d", a.SourceDocuments.Payments.NumberOfEntries, numPayments)
 	}
 
-	if decimal.Decimal(a.SourceDocuments.Payments.TotalCredit).Cmp(totalCredit) != 0 {
+	if a.SourceDocuments.Payments.TotalCredit.Cmp(totalCredit) != 0 {
 		return fmt.Errorf("saft: invalid TotalCredit: %s != calculated %s", a.SourceDocuments.Payments.TotalCredit, totalCredit)
 	}
 
-	if decimal.Decimal(a.SourceDocuments.Payments.TotalDebit).Cmp(totalDebit) != 0 {
+	if a.SourceDocuments.Payments.TotalDebit.Cmp(totalDebit) != 0 {
 		return fmt.Errorf("saft: invalid TotalDebit: %s != calculated %s", a.SourceDocuments.Payments.TotalDebit, totalDebit)
 	}
 
@@ -338,7 +336,7 @@ func (a *AuditFile) checkPayments() error {
 			return fmt.Errorf("saft: missing Payment.TransactionDate")
 		}
 
-		if time.Time(payment.TransactionDate).After(time.Now()) {
+		if payment.TransactionDate.After(time.Now()) {
 			return fmt.Errorf("saft: invalid Payment.TransactionDate")
 		}
 
@@ -387,7 +385,7 @@ func (a *AuditFile) checkPayments() error {
 				}
 			}
 
-			if decimal.Decimal(method.PaymentAmount).LessThan(decimal.NewFromInt(0)) {
+			if method.PaymentAmount.LessThan(decimal.NewFromInt(0)) {
 				return fmt.Errorf("saft: invalid PaymentMethod.PaymentAmount: %s", method.PaymentAmount)
 			}
 
@@ -395,7 +393,7 @@ func (a *AuditFile) checkPayments() error {
 				return fmt.Errorf("saft: missing PaymentMethod.PaymentDate")
 			}
 
-			if time.Time(method.PaymentDate).After(time.Now()) {
+			if method.PaymentDate.After(time.Now()) {
 				return fmt.Errorf("saft: invalid PaymentMethod.PaymentDate")
 			}
 
@@ -420,26 +418,27 @@ func (a *AuditFile) checkPayments() error {
 				}
 
 				if line.DebitAmount != nil {
-					if decimal.Decimal(*line.DebitAmount).LessThan(decimal.NewFromInt(0)) {
+					if (*line.DebitAmount).LessThan(decimal.NewFromInt(0)) {
 						return fmt.Errorf("saft: invalid PaymentLine.DebitAmount: %s", line.DebitAmount)
 					}
 				}
 
 				if line.CreditAmount != nil {
-					if decimal.Decimal(*line.CreditAmount).LessThan(decimal.NewFromInt(0)) {
+					if (*line.CreditAmount).LessThan(decimal.NewFromInt(0)) {
 						return fmt.Errorf("saft: invalid PaymentLine.CreditAmount: %s", line.CreditAmount)
 					}
 				}
 
 				// If PaymentType is RC, then Tax must be present
 				if payment.PaymentType == SaftptpaymentTypeRC && line.Tax == nil {
-					return fmt.Errorf("saft: missing PaymentLine.Tax")
+					return fmt.Errorf("saft: missing mandatory PaymentLine.Tax due to PaymentType = RC")
 				}
 
+				// TODO: check later, field 4.4.4.14.6 of portaria
 				// If PaymentType is RG, then Tax must not be present
-				if payment.PaymentType == SaftptpaymentTypeRG && line.Tax != nil {
-					return fmt.Errorf("saft: invalid PaymentLine.Tax")
-				}
+				//if payment.PaymentType == SaftptpaymentTypeRG && line.Tax.TaxType ==  {
+				//	return fmt.Errorf("saft: invalid PaymentLine.Tax")
+				//}
 
 				if line.Tax != nil {
 					if line.Tax.TaxType != TaxTypeIVA && line.Tax.TaxType != TaxTypeIS && line.Tax.TaxType != TaxTypeNS {
@@ -447,7 +446,7 @@ func (a *AuditFile) checkPayments() error {
 					}
 
 					// Check if its a ISO 3166-1 alpha-2 country code + PT regions
-					if slices.Contains(common.CountryCodesPTRegions, line.Tax.TaxCountryRegion) {
+					if !slices.Contains(common.CountryCodesPTRegions, line.Tax.TaxCountryRegion) {
 						return fmt.Errorf("saft: invalid PaymentLine.Tax.TaxCountryRegion: %s", line.Tax.TaxCountryRegion)
 					}
 
@@ -458,22 +457,23 @@ func (a *AuditFile) checkPayments() error {
 
 					// TaxPercentage can only be zero if TaxCode is Ise or Na
 					if line.Tax.TaxPercentage != nil &&
-						decimal.Decimal(*line.Tax.TaxPercentage) == decimal.NewFromInt(0) &&
+						(*line.Tax.TaxPercentage).Cmp(decimal.NewFromInt(0)) == 0 &&
 						(line.Tax.TaxCode != PaymentTaxCode(TaxCodeIse) && line.Tax.TaxCode != PaymentTaxCode(TaxCodeNa)) {
 						return fmt.Errorf("saft: invalid PaymentLine.Tax: TaxPercentage is zero but TaxCode is not Ise or Na")
 					}
 
 					// TaxPercentage must be 0 or greater
-					if line.Tax.TaxPercentage != nil && decimal.Decimal(*line.Tax.TaxPercentage).LessThan(decimal.NewFromInt(0)) {
+					if line.Tax.TaxPercentage != nil && (*line.Tax.TaxPercentage).LessThan(decimal.NewFromInt(0)) {
 						return fmt.Errorf("saft: invalid PaymentLine.Tax.TaxPercentage: %s", line.Tax.TaxPercentage)
 					}
 
 					// Calculate the TaxPayable using the TaxPercentage
 					if line.Tax.TaxPercentage != nil {
-						taxPercentage := decimal.Decimal(*line.Tax.TaxPercentage)
-						debitAmount := decimal.Decimal(*line.DebitAmount)
-						taxMultiplier := taxPercentage.Div(decimal.NewFromInt(100)).Add(decimal.NewFromInt(1))
-						taxPayable = taxPayable.Add((debitAmount.Mul(taxMultiplier)).Sub(debitAmount))
+						taxMultiplier := (*line.Tax.TaxPercentage).Div(decimal.NewFromInt(100)).Add(decimal.NewFromInt(1))
+						if line.DebitAmount != nil {
+							debitAmount := (*line.DebitAmount)
+							taxPayable = taxPayable.Add((debitAmount.Mul(taxMultiplier)).Sub(debitAmount.Decimal))
+						}
 					}
 
 					// TaxAmount can only appear if TaxType is IS
@@ -481,13 +481,13 @@ func (a *AuditFile) checkPayments() error {
 						return fmt.Errorf("saft: invalid PaymentLine.Tax: TaxAmount present but TaxType is not IS")
 					}
 
-					if decimal.Decimal(*line.Tax.TaxAmount).LessThan(decimal.NewFromInt(0)) {
+					if (*line.Tax.TaxAmount).LessThan(decimal.NewFromInt(0)) {
 						return fmt.Errorf("saft: invalid PaymentLine.Tax.TaxAmount: %s", line.Tax.TaxAmount)
 					}
 
 					// Add the TaxAmount to the TaxPayable
 					if line.Tax.TaxAmount != nil {
-						taxPayable = taxPayable.Add(decimal.Decimal(*line.Tax.TaxAmount))
+						taxPayable = taxPayable.Add(line.Tax.TaxAmount.Decimal)
 					}
 
 				}
@@ -498,7 +498,7 @@ func (a *AuditFile) checkPayments() error {
 				//}
 
 				// TaxExemptionReason and TaxExemptionCode must exist when TaxPercentage/TaxAmount is 0
-				if line.Tax != nil && line.Tax.TaxPercentage != nil && decimal.Decimal(*line.Tax.TaxPercentage) == decimal.NewFromInt(0) {
+				if line.Tax != nil && line.Tax.TaxPercentage != nil && (*line.Tax.TaxPercentage).Cmp(decimal.NewFromInt(0)) == 0 {
 					if line.TaxExemptionReason == nil || line.TaxExemptionCode == nil {
 						return fmt.Errorf("saft: missing PaymentLine.TaxExemptionReason or PaymentLine.TaxExemptionCode")
 					}
@@ -521,7 +521,7 @@ func (a *AuditFile) checkPayments() error {
 			return fmt.Errorf("saft: missing Payment.DocumentTotals")
 		}
 
-		if decimal.Decimal(payment.DocumentTotals.TaxPayable).Cmp(taxPayable) != 0 {
+		if payment.DocumentTotals.TaxPayable.Cmp(taxPayable) != 0 {
 			return fmt.Errorf("saft: invalid Payment.DocumentTotals.TaxPayable: %s != calculated %s", payment.DocumentTotals.GrossTotal, totalDebit)
 		}
 
@@ -531,21 +531,21 @@ func (a *AuditFile) checkPayments() error {
 
 		for _, line := range payment.Line {
 			if line.DebitAmount != nil {
-				netTotal = netTotal.Add(decimal.Decimal(*line.DebitAmount))
+				netTotal = netTotal.Add(line.DebitAmount.Decimal)
 				//grossTotal = grossTotal.Add(decimal.Decimal(*line.DebitAmount))
 			}
 
 			if line.CreditAmount != nil {
-				netTotal = netTotal.Sub(decimal.Decimal(*line.CreditAmount))
+				netTotal = netTotal.Sub(line.CreditAmount.Decimal)
 				//grossTotal = grossTotal.Sub(decimal.Decimal(*line.CreditAmount))
 			}
 
 			//  get the tax amount
 			if line.Tax != nil && line.Tax.TaxPercentage != nil {
-				taxMultiplier := decimal.Decimal(*line.Tax.TaxPercentage).Div(decimal.NewFromInt(100)).Add(decimal.NewFromInt(1))
+				taxMultiplier := (*line.Tax.TaxPercentage).Div(decimal.NewFromInt(100)).Add(decimal.NewFromInt(1))
 				grossTotal = grossTotal.Add(netTotal.Div(taxMultiplier))
 			} else if line.Tax != nil && line.Tax.TaxAmount != nil {
-				grossTotal = grossTotal.Add(netTotal.Add(decimal.Decimal(*line.Tax.TaxAmount)))
+				grossTotal = grossTotal.Add(netTotal.Add(line.Tax.TaxAmount.Decimal))
 			}
 		}
 

@@ -14,7 +14,7 @@ func main() {
 	}
 
 	// print the AuditFile
-	fmt.Println(a.SourceDocuments.SalesInvoices.Invoice[0])
+	//fmt.Println(a.SourceDocuments.SalesInvoices.Invoice[0])
 
 	// Convert the AuditFile to XML
 	xml, err := a.ToXML()
