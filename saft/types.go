@@ -2071,19 +2071,6 @@ func (s *SafdateType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 
 type SafdecimalType decimal.Decimal
 
-type SafmonetaryType decimal.Decimal
-
-func (s SafdecimalType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	value := decimal.Decimal(s).String()
-	return e.EncodeElement(value, start)
-}
-
-// Convert SafmonetaryType to XML
-func (s SafmonetaryType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	value := decimal.Decimal(s).String()
-	return e.EncodeElement(value, start)
-}
-
 // Read SafdecimalType from XML
 func (s *SafdecimalType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var value string
@@ -2098,6 +2085,23 @@ func (s *SafdecimalType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 	return nil
 }
 
+func (s SafdecimalType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	value := decimal.Decimal(s).String()
+	return e.EncodeElement(value, start)
+}
+
+func (s SafdecimalType) String() string {
+	return decimal.Decimal(s).String()
+}
+
+type SafmonetaryType decimal.Decimal
+
+// Convert SafmonetaryType to XML
+func (s SafmonetaryType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	value := decimal.Decimal(s).String()
+	return e.EncodeElement(value, start)
+}
+
 // Read SafmonetaryType from XML
 func (s *SafmonetaryType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var value string
@@ -2110,6 +2114,10 @@ func (s *SafmonetaryType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 	}
 	*s = SafmonetaryType(decimalValue)
 	return nil
+}
+
+func (s SafmonetaryType) String() string {
+	return decimal.Decimal(s).String()
 }
 
 type CustomerCountry string
