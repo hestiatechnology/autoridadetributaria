@@ -1,0 +1,9 @@
+9,OPEN,Validate Tax Table in SAFT,saft,2025-02-17T17:02:45Z
+8,OPEN,Validate Payments (if it exists) in SAFT,saft,2025-01-27T14:56:38Z
+7,CLOSED,Validate Customers in SAFT,saft,2025-01-27T16:39:03Z
+6,CLOSED,Validate header in SAFT,saft,2025-01-27T14:56:55Z
+5,CLOSED,Saft: Invoicing structure,,2025-01-23T23:59:49Z
+4,CLOSED,Validate NIF,enhancement,2024-10-31T11:04:00Z
+3,OPEN,Add TaxTable automatically,,2024-10-02T00:09:51Z
+2,OPEN,SAFT: validation,saft,2025-02-17T17:02:40Z
+1,OPEN,SAFT: signatures,saft,2025-02-17T17:02:51Z
