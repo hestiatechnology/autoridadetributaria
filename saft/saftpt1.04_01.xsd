@@ -737,19 +737,19 @@
                                                   <xs:element ref="LineNumber"/>
                                                   <xs:element name="SourceDocumentID"
                                                   maxOccurs="unbounded">
-                                                  <xs:complexType>
-                                                  <xs:sequence>
-                                                  <xs:element ref="OriginatingON"/>
-                                                  <xs:element ref="InvoiceDate"/>
-                                                  <xs:element ref="Description" minOccurs="0"/>
-                                                  </xs:sequence>
-                                                  </xs:complexType>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element ref="OriginatingON"/>
+                                                            <xs:element ref="InvoiceDate"/>
+                                                            <xs:element ref="Description" minOccurs="0"/>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
                                                   </xs:element>
                                                   <xs:element ref="SettlementAmount" minOccurs="0"/>
-                                                  <xs:choice>
-                                                  <xs:element ref="DebitAmount"/>
-                                                  <xs:element ref="CreditAmount"/>
-                                                  </xs:choice>
+                                                    <xs:choice>
+                                                        <xs:element ref="DebitAmount"/>
+                                                        <xs:element ref="CreditAmount"/>
+                                                    </xs:choice>
                                                   <xs:element name="Tax" type="PaymentTax"
                                                   minOccurs="0"/>
                                                   <xs:element ref="TaxExemptionReason" minOccurs="0"/>
@@ -790,11 +790,11 @@
                                                   <xs:element ref="GrossTotal"/>
                                                   <!-- O conteudo desta estrutura Settlement representa o somatorio dos descontos reflectidos no elemento SettlementAmount das linhas do recibo. Trata-se de um raciocinio diverso da tabela 4.1 SalesInvoices -->
                                                   <xs:element name="Settlement" minOccurs="0">
-                                                  <xs:complexType>
-                                                  <xs:sequence>
-                                                  <xs:element ref="SettlementAmount"/>
-                                                  </xs:sequence>
-                                                  </xs:complexType>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element ref="SettlementAmount"/>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
                                                   </xs:element>
                                                   <xs:element name="Currency" type="Currency"
                                                   minOccurs="0"/>
