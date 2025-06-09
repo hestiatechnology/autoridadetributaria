@@ -1,323 +1,326 @@
 package validation
 
 import (
+	"errors"
 	"fmt"
-	"slices"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
-	"github.com/hestiatechnology/autoridadetributaria/common"
 	"github.com/hestiatechnology/autoridadetributaria/saft"
-	"github.com/shopspring/decimal"
 )
 
-func ValidatePayments(a *saft.AuditFile) error {
+// Copied helper constants and functions (assuming not in a shared package for this context)
+const (
+	saftDateFormat     = "2006-01-02"
+	saftDateTimeFormat = "2006-01-02T15:04:05"
+)
 
-	if a.SourceDocuments == nil && a.SourceDocuments.Payments == nil {
-		return nil
+var (
+	countryCodeRegexPayments  = regexp.MustCompile(`^[A-Z]{2}$`)
+	currencyCodeRegexPayments = regexp.MustCompile(`^[A-Z]{3}$`)
+)
+
+func isValidDatePayments(dateStr string) bool {
+	if dateStr == "" { return false }
+	_, err := time.Parse(saftDateFormat, dateStr)
+	return err == nil
+}
+
+func isValidDateTimePayments(dateTimeStr string) bool {
+	if dateTimeStr == "" { return false }
+	_, err := time.Parse(saftDateTimeFormat, dateTimeStr)
+	return err == nil
+}
+
+func parseDecimalPayments(s string) (float64, error) {
+	if s == "" { return 0, errors.New("amount string is empty") }
+	return strconv.ParseFloat(strings.TrimSpace(s), 64)
+}
+
+func isValidIntegerPayments(s string, allowZero bool, allowNegative bool) (int, bool) {
+	if s == "" { return 0, false }
+	i, err := strconv.Atoi(strings.TrimSpace(s))
+	if err != nil { return 0, false }
+	if !allowZero && i == 0 { return 0, false }
+	if !allowNegative && i < 0 { return 0, false }
+	return i, true
+}
+
+// ValidatePayments validates the Payments section.
+func ValidatePayments(
+	p *saft.Payments,
+	customerIDs map[string]bool, // Map of valid CustomerIDs
+	// Map of valid invoice numbers to their dates for SourceDocumentID validation.
+	// Key: OriginatingON (InvoiceNo), Value: InvoiceDate (as time.Time for accurate comparison)
+	validInvoiceReferences map[string]time.Time,
+) []error {
+	var errs []error
+
+	if p == nil {
+		errs = append(errs, errors.New("Payments section is nil"))
+		return errs
 	}
 
-	// Calculate the number of registered payments, total debits and total credits
-	numPayments := uint64(0)
-	var totalDebit, totalCredit decimal.Decimal
-	for _, payment := range a.SourceDocuments.Payments.Payment {
-		if len(payment.Line) == 0 {
-			return fmt.Errorf("saft: missing Payment.Line")
+	actualNumberOfEntries := len(p.Payment)
+	calculatedTotalDebit := 0.0
+	calculatedTotalCredit := 0.0
+
+	for _, paymentDoc := range p.Payment {
+		if paymentDoc.DocumentTotals != nil {
+			// For payments (RC), GrossTotal typically debits cash and credits AR.
+			// So, TotalDebit and TotalCredit in the summary might reflect this.
+			// This interpretation can vary. Using GrossTotal for both as a common summary approach.
+			grossTotal, err := parseDecimalPayments(paymentDoc.DocumentTotals.GrossTotal)
+			if err == nil {
+				calculatedTotalCredit += grossTotal
+				calculatedTotalDebit += grossTotal
+			}
 		}
-
-		numPayments++
-		for _, line := range payment.Line {
-			// Can't have both debit and credit
-			if line.DebitAmount != nil && line.CreditAmount != nil {
-				return fmt.Errorf("saft: invalid Payment.Line: both DebitAmount and CreditAmount present")
-			}
-
-			if line.DebitAmount != nil {
-				totalDebit = totalDebit.Add((*line.DebitAmount).Decimal)
-			}
-
-			if line.CreditAmount != nil {
-				totalCredit = totalCredit.Add(line.CreditAmount.Decimal)
-			}
-		}
 	}
 
-	// Check if the total debit and total credit are the same
-	if a.SourceDocuments.Payments.NumberOfEntries != numPayments {
-		return fmt.Errorf("saft: invalid NumberOfEntries: %d != calculated %d", a.SourceDocuments.Payments.NumberOfEntries, numPayments)
+	numEntriesDeclared, err := strconv.Atoi(p.NumberOfEntries)
+	if err != nil || numEntriesDeclared != actualNumberOfEntries {
+		errs = append(errs, fmt.Errorf("mismatch in NumberOfEntries: declared %s, actual %d", p.NumberOfEntries, actualNumberOfEntries))
 	}
 
-	if a.SourceDocuments.Payments.TotalCredit.Cmp(totalCredit) != 0 {
-		return fmt.Errorf("saft: invalid TotalCredit: %s != calculated %s", a.SourceDocuments.Payments.TotalCredit, totalCredit)
+	totalDebitDeclared, errDb := parseDecimalPayments(p.TotalDebit)
+	if errDb != nil {
+		errs = append(errs, fmt.Errorf("invalid TotalDebit format: %s", p.TotalDebit))
+	} else if totalDebitDeclared != calculatedTotalDebit {
+		errs = append(errs, fmt.Errorf("mismatch in TotalDebit: declared %.2f, calculated %.2f", totalDebitDeclared, calculatedTotalDebit))
 	}
 
-	if a.SourceDocuments.Payments.TotalDebit.Cmp(totalDebit) != 0 {
-		return fmt.Errorf("saft: invalid TotalDebit: %s != calculated %s", a.SourceDocuments.Payments.TotalDebit, totalDebit)
+	totalCreditDeclared, errCr := parseDecimalPayments(p.TotalCredit)
+	if errCr != nil {
+		errs = append(errs, fmt.Errorf("invalid TotalCredit format: %s", p.TotalCredit))
+	} else if totalCreditDeclared != calculatedTotalCredit {
+		errs = append(errs, fmt.Errorf("mismatch in TotalCredit: declared %.2f, calculated %.2f", totalCreditDeclared, calculatedTotalCredit))
 	}
 
-	for _, payment := range a.SourceDocuments.Payments.Payment {
+	for pIdx, payment := range p.Payment {
+		pIdentifier := fmt.Sprintf("Payment[%d RefNo:%s]", pIdx, payment.PaymentRefNo)
+
 		if payment.PaymentRefNo == "" {
-			return fmt.Errorf("saft: missing Payment.PaymentRefNo")
+			errs = append(errs, fmt.Errorf("%s: PaymentRefNo is required", pIdentifier))
+		}
+		if payment.ATCUD == "" { // ATCUD is usually mandatory for documents subject to certification
+			errs = append(errs, fmt.Errorf("%s: ATCUD is required", pIdentifier))
 		}
 
-		if payment.Atcud == "" {
-			return fmt.Errorf("saft: missing Payment.Atcud")
+		if payment.Period != "" { // Optional field
+			if _, ok := isValidIntegerPayments(payment.Period, false, false); !ok {
+				errs = append(errs, fmt.Errorf("%s: Period '%s' is not a valid positive integer", pIdentifier, payment.Period))
+			}
+		}
+		if payment.TransactionID != "" { // Optional field
+			// No specific format, just not empty if provided.
+		}
+		if !isValidDatePayments(payment.TransactionDate) {
+			errs = append(errs, fmt.Errorf("%s: TransactionDate '%s' is invalid", pIdentifier, payment.TransactionDate))
 		}
 
-		// TODO: Validate ATCUD?
-
-		// Transaction Id validation is done in the constraints
-
-		if payment.TransactionDate == (saft.SafdateType{}) {
-			return fmt.Errorf("saft: missing Payment.TransactionDate")
+		validPaymentTypes := map[string]bool{"RC": true, "RG": true}
+		if _, ok := validPaymentTypes[payment.PaymentType]; !ok {
+			errs = append(errs, fmt.Errorf("%s: PaymentType '%s' is invalid", pIdentifier, payment.PaymentType))
+		}
+		if payment.Description != "" { // Optional field
+			// No specific format, just not empty if provided.
+		}
+		if payment.SystemID != "" { // Optional field
+			// No specific format, just not empty if provided.
 		}
 
-		if payment.TransactionDate.After(time.Now()) {
-			return fmt.Errorf("saft: invalid Payment.TransactionDate")
+		// DocumentStatus Validation
+		if payment.DocumentStatus == nil {
+			errs = append(errs, fmt.Errorf("%s: DocumentStatus is required", pIdentifier))
+		} else {
+			ds := payment.DocumentStatus
+			validPaymentStatus := map[string]bool{"N": true, "A": true, "P": true}
+			if _, ok := validPaymentStatus[ds.PaymentStatus]; !ok {
+				errs = append(errs, fmt.Errorf("%s: DocumentStatus.PaymentStatus '%s' is invalid", pIdentifier, ds.PaymentStatus))
+			}
+			if !isValidDateTimePayments(ds.PaymentStatusDate) {
+				errs = append(errs, fmt.Errorf("%s: DocumentStatus.PaymentStatusDate '%s' is invalid", pIdentifier, ds.PaymentStatusDate))
+			}
+			if ds.SourceID == "" {
+				errs = append(errs, fmt.Errorf("%s: DocumentStatus.SourceID is required", pIdentifier))
+			}
+			validSourcePayment := map[string]bool{"P": true, "I": true, "M": true}
+			if _, ok := validSourcePayment[ds.SourcePayment]; !ok {
+				errs = append(errs, fmt.Errorf("%s: DocumentStatus.SourcePayment '%s' is invalid", pIdentifier, ds.SourcePayment))
+			}
 		}
 
-		if payment.PaymentType != saft.SaftptpaymentTypeRC && payment.PaymentType != saft.SaftptpaymentTypeRG {
-			return fmt.Errorf("saft: invalid Payment.PaymentType")
-		}
-
-		if payment.DocumentStatus == (saft.PaymentDocumentStatus{}) {
-			return fmt.Errorf("saft: missing Payment.DocumentStatus")
-		}
-
-		if payment.DocumentStatus.PaymentStatus != saft.PaymentStatusNormal && payment.DocumentStatus.PaymentStatus != saft.PaymentStatusCancelled {
-			return fmt.Errorf("saft: invalid Payment.DocumentStatus.PaymentStatus")
-		}
-
-		if payment.DocumentStatus.PaymentStatusDate == (saft.SafdateTimeType{}) {
-			return fmt.Errorf("saft: missing Payment.DocumentStatus.PaymentStatusDate")
-		}
-
-		if time.Time(payment.DocumentStatus.PaymentStatusDate).After(time.Now()) {
-			return fmt.Errorf("saft: invalid Payment.DocumentStatus.PaymentStatusDate")
-		}
-
-		if payment.DocumentStatus.SourceId == "" {
-			return fmt.Errorf("saft: missing Payment.DocumentStatus.SourceId")
-		}
-
-		if payment.DocumentStatus.SourcePayment != saft.SaftptsourcePaymentP &&
-			payment.DocumentStatus.SourcePayment != saft.SaftptsourcePaymentI &&
-			payment.DocumentStatus.SourcePayment != saft.SaftptsourcePaymentM {
-			return fmt.Errorf("saft: invalid Payment.DocumentStatus.SourcePayment")
-		}
-
-		if len(payment.PaymentMethod) == 0 {
-			return fmt.Errorf("saft: missing Payment.PaymentMethod")
-		}
-
-		taxPayable := decimal.NewFromInt(0)
-		for _, method := range payment.PaymentMethod {
-			if method.PaymentMechanism != nil {
-				switch *method.PaymentMechanism {
-				case saft.PaymentMechanismCC, saft.PaymentMechanismCD, saft.PaymentMechanismCH, saft.PaymentMechanismCI, saft.PaymentMechanismCO, saft.PaymentMechanismCS, saft.PaymentMechanismDE, saft.PaymentMechanismLC, saft.PaymentMechanismMB, saft.PaymentMechanismNU, saft.PaymentMechanismOU, saft.PaymentMechanismPR, saft.PaymentMechanismTB, saft.PaymentMechanismTR:
-					// Ignore
-				default:
-					return fmt.Errorf("saft: invalid PaymentMethod.PaymentMechanism: %s", *method.PaymentMechanism)
+		// PaymentMethod Validation
+		if payment.PaymentMethod == nil || len(payment.PaymentMethod) == 0 {
+             errs = append(errs, fmt.Errorf("%s: At least one PaymentMethod is required", pIdentifier))
+        }
+		for pmIdx, pm := range payment.PaymentMethod {
+			pmIdentifier := fmt.Sprintf("%s PaymentMethod[%d]", pIdentifier, pmIdx)
+			validMechanisms := map[string]bool{
+				"CC": true, "CD": true, "CH": true, "CI": true, "CO": true, "CS": true, "DE": true,
+				"LC": true, "MB": true, "NU": true, "OU": true, "PR": true, "TB": true, "TR": true,
+			}
+			if pm.PaymentMechanism != "" { // Optional field
+				if _, ok := validMechanisms[pm.PaymentMechanism]; !ok {
+					errs = append(errs, fmt.Errorf("%s: PaymentMechanism '%s' is invalid", pmIdentifier, pm.PaymentMechanism))
 				}
 			}
+			if _, err := parseDecimalPayments(pm.PaymentAmount); err != nil {
+				errs = append(errs, fmt.Errorf("%s: PaymentAmount '%s' is not a valid decimal: %v", pmIdentifier, pm.PaymentAmount, err))
+			}
+			if !isValidDatePayments(pm.PaymentDate) {
+				errs = append(errs, fmt.Errorf("%s: PaymentDate '%s' is invalid", pmIdentifier, pm.PaymentDate))
+			}
+		}
 
-			if method.PaymentAmount.LessThan(decimal.NewFromInt(0)) {
-				return fmt.Errorf("saft: invalid PaymentMethod.PaymentAmount: %s", method.PaymentAmount)
+		if payment.SourceID == "" { // SourceID at Payment level
+			errs = append(errs, fmt.Errorf("%s: SourceID (at Payment level) is required", pIdentifier))
+		}
+		if !isValidDateTimePayments(payment.SystemEntryDate) {
+			errs = append(errs, fmt.Errorf("%s: SystemEntryDate '%s' is invalid", pIdentifier, payment.SystemEntryDate))
+		}
+		if payment.CustomerID == "" {
+			errs = append(errs, fmt.Errorf("%s: CustomerID is required", pIdentifier))
+		} else if _, ok := customerIDs[payment.CustomerID]; !ok {
+			errs = append(errs, fmt.Errorf("%s: CustomerID '%s' is invalid or not found", pIdentifier, payment.CustomerID))
+		}
+
+		// Line Validation
+		if payment.Line == nil || len(payment.Line) == 0 {
+             errs = append(errs, fmt.Errorf("%s: At least one Line is required", pIdentifier))
+        }
+		for lineIdx, line := range payment.Line {
+			lineIdentifier := fmt.Sprintf("%s Line[%d]", pIdentifier, lineIdx+1)
+
+			ln, ok := isValidIntegerPayments(line.LineNumber, false, false)
+			if !ok || ln != lineIdx+1 {
+				errs = append(errs, fmt.Errorf("%s: LineNumber '%s' is invalid or out of sequence (expected %d)", lineIdentifier, line.LineNumber, lineIdx+1))
 			}
 
-			if method.PaymentDate == (saft.SafdateType{}) {
-				return fmt.Errorf("saft: missing PaymentMethod.PaymentDate")
-			}
-
-			if method.PaymentDate.After(time.Now()) {
-				return fmt.Errorf("saft: invalid PaymentMethod.PaymentDate")
-			}
-
-			if payment.SourceId == "" {
-				return fmt.Errorf("saft: missing Payment.SourceId")
-			}
-
-			if payment.CustomerId == "" {
-				return fmt.Errorf("saft: missing Payment.CustomerId")
-			}
-
-			for _, line := range payment.Line {
-				// LineNumber can be 0 I guess
-
-				if len(line.SourceDocumentId) == 0 {
-					return fmt.Errorf("saft: missing PaymentLine.SourceDocumentId")
+			// SourceDocumentID Validation (links to invoices)
+			if line.SourceDocumentID == nil || len(line.SourceDocumentID) == 0 {
+                 errs = append(errs, fmt.Errorf("%s: At least one SourceDocumentID is required per Line", lineIdentifier))
+            }
+			for sdIdx, sd := range line.SourceDocumentID {
+				sdIdentifier := fmt.Sprintf("%s SourceDocumentID[%d]", lineIdentifier, sdIdx)
+				if sd.OriginatingON == "" {
+					errs = append(errs, fmt.Errorf("%s: OriginatingON is required", sdIdentifier))
 				}
-				for _, sourceDocument := range line.SourceDocumentId {
-					if sourceDocument.OriginatingOn == "" {
-						return fmt.Errorf("saft: missing PaymentLine.SourceDocumentId.OriginatingOn")
-					}
+				if !isValidDatePayments(sd.InvoiceDate) { // This is InvoiceDate of the original document
+					errs = append(errs, fmt.Errorf("%s: InvoiceDate '%s' is invalid", sdIdentifier, sd.InvoiceDate))
 				}
-
-				if line.DebitAmount != nil {
-					if (*line.DebitAmount).LessThan(decimal.NewFromInt(0)) {
-						return fmt.Errorf("saft: invalid PaymentLine.DebitAmount: %s", line.DebitAmount)
-					}
-				}
-
-				if line.CreditAmount != nil {
-					if (*line.CreditAmount).LessThan(decimal.NewFromInt(0)) {
-						return fmt.Errorf("saft: invalid PaymentLine.CreditAmount: %s", line.CreditAmount)
-					}
-				}
-
-				// If PaymentType is RC, then Tax must be present
-				if payment.PaymentType == saft.SaftptpaymentTypeRC && line.Tax == nil {
-					return fmt.Errorf("saft: missing mandatory PaymentLine.Tax due to PaymentType = RC")
-				}
-
-				// TODO: check later, field 4.4.4.14.6 of portaria
-				// If PaymentType is RG, then Tax must not be present
-				//if payment.PaymentType == SaftptpaymentTypeRG && line.Tax.TaxType ==  {
-				//	return fmt.Errorf("saft: invalid PaymentLine.Tax")
-				//}
-
-				if line.Tax != nil {
-					if line.Tax.TaxType != saft.TaxTypeIVA && line.Tax.TaxType != saft.TaxTypeIS && line.Tax.TaxType != saft.TaxTypeNS {
-						return fmt.Errorf("saft: invalid PaymentLine.Tax.TaxType: %s", line.Tax.TaxType)
-					}
-
-					// Check if its a ISO 3166-1 alpha-2 country code + PT regions
-					if !slices.Contains(common.CountryCodesPTRegions, line.Tax.TaxCountryRegion) {
-						return fmt.Errorf("saft: invalid PaymentLine.Tax.TaxCountryRegion: %s", line.Tax.TaxCountryRegion)
-					}
-
-					// Cant have both TaxPercentage and TaxAmount
-					if line.Tax.TaxPercentage != nil && line.Tax.TaxAmount != nil {
-						return fmt.Errorf("saft: invalid PaymentLine.Tax: both TaxPercentage and TaxAmount present")
-					}
-
-					// TaxPercentage can only be zero if TaxCode is Ise or Na
-					if line.Tax.TaxPercentage != nil &&
-						(*line.Tax.TaxPercentage).Cmp(decimal.NewFromInt(0)) == 0 &&
-						(line.Tax.TaxCode != saft.PaymentTaxCode(saft.TaxCodeIse) && line.Tax.TaxCode != saft.PaymentTaxCode(saft.TaxCodeNa)) {
-						return fmt.Errorf("saft: invalid PaymentLine.Tax: TaxPercentage is zero but TaxCode is not Ise or Na")
-					}
-
-					// TaxPercentage must be 0 or greater
-					if line.Tax.TaxPercentage != nil && (*line.Tax.TaxPercentage).LessThan(decimal.NewFromInt(0)) {
-						return fmt.Errorf("saft: invalid PaymentLine.Tax.TaxPercentage: %s", line.Tax.TaxPercentage)
-					}
-
-					// Calculate the TaxPayable using the TaxPercentage
-					if line.Tax.TaxPercentage != nil {
-						taxMultiplier := (*line.Tax.TaxPercentage).Div(decimal.NewFromInt(100)).Add(decimal.NewFromInt(1))
-						if line.DebitAmount != nil {
-							debitAmount := (*line.DebitAmount)
-							taxPayable = taxPayable.Add((debitAmount.Mul(taxMultiplier)).Sub(debitAmount.Decimal))
+				// Deeper validation against validInvoiceReferences map
+				if sd.OriginatingON != "" && validInvoiceReferences != nil {
+					expectedInvoiceDate, refOk := validInvoiceReferences[sd.OriginatingON]
+					if !refOk {
+						errs = append(errs, fmt.Errorf("%s: OriginatingON '%s' not found in valid invoice references", sdIdentifier, sd.OriginatingON))
+					} else {
+						parsedInvoiceDate, _ := time.Parse(saftDateFormat, sd.InvoiceDate)
+						if !parsedInvoiceDate.Equal(expectedInvoiceDate) {
+							errs = append(errs, fmt.Errorf("%s: InvoiceDate '%s' does not match registered date '%s' for OriginatingON '%s'", sdIdentifier, sd.InvoiceDate, expectedInvoiceDate.Format(saftDateFormat), sd.OriginatingON))
 						}
 					}
-
-					// TaxAmount can only appear if TaxType is IS
-					if line.Tax.TaxAmount != nil && line.Tax.TaxType != saft.TaxTypeIS {
-						return fmt.Errorf("saft: invalid PaymentLine.Tax: TaxAmount present but TaxType is not IS")
-					}
-
-					if (*line.Tax.TaxAmount).LessThan(decimal.NewFromInt(0)) {
-						return fmt.Errorf("saft: invalid PaymentLine.Tax.TaxAmount: %s", line.Tax.TaxAmount)
-					}
-
-					// Add the TaxAmount to the TaxPayable
-					if line.Tax.TaxAmount != nil {
-						taxPayable = taxPayable.Add(line.Tax.TaxAmount.Decimal)
-					}
-
-				}
-
-				//// Cant have Tax and TaxExemptionReason and TaxExemptionCodesaft.
-				//if line.Tax != nil && line.TaxExemptionReason != nil && line.TaxExemptionCode != nil {
-				//	return errcodes.ErrPaymentLineTaxTaxExemption
-				//}
-
-				// TaxExemptionReason and TaxExemptionCode must exist when TaxPercentage/TaxAmount is 0
-				if line.Tax != nil && line.Tax.TaxPercentage != nil && (*line.Tax.TaxPercentage).Cmp(decimal.NewFromInt(0)) == 0 {
-					if line.TaxExemptionReason == nil || line.TaxExemptionCode == nil {
-						return fmt.Errorf("saft: missing PaymentLine.TaxExemptionReason or PaymentLine.TaxExemptionCode")
-					}
-				}
-
-				// Check if TaxExemption is valid
-				if line.TaxExemptionCode != nil && line.TaxExemptionReason != nil {
-					for _, exemption := range common.VatExemptionCodes {
-						if saft.SafptportugueseTaxExemptionCode(exemption.Code) == *line.TaxExemptionCode && saft.SafptportugueseTaxExemptionReason(exemption.Description) == *line.TaxExemptionReason {
-							break
-						}
-					}
-					return fmt.Errorf("saft: invalid PaymentLine.TaxExemptionCode or PaymentLine.TaxExemptionReason")
 				}
 			}
 
-		}
-
-		if payment.DocumentTotals == (saft.PaymentDocumentTotals{}) {
-			return fmt.Errorf("saft: missing Payment.DocumentTotals")
-		}
-
-		if payment.DocumentTotals.TaxPayable.Cmp(taxPayable) != 0 {
-			return fmt.Errorf("saft: invalid Payment.DocumentTotals.TaxPayable: %s != calculated %s", payment.DocumentTotals.GrossTotal, totalDebit)
-		}
-
-		// Calculate NetTotal and GrossTotal
-		netTotal := decimal.NewFromInt(0)
-		grossTotal := decimal.NewFromInt(0)
-		settlementTotal := decimal.NewFromInt(0)
-		for _, line := range payment.Line {
-			if line.DebitAmount != nil {
-				netTotal = netTotal.Add(line.DebitAmount.Decimal)
-				//grossTotal = grossTotal.Add(decimal.Decimal(*line.DebitAmount))
+			if line.SettlementAmount != "" { // Optional
+				if _, err := parseDecimalPayments(line.SettlementAmount); err != nil {
+					errs = append(errs, fmt.Errorf("%s: SettlementAmount '%s' is not a valid decimal: %v", lineIdentifier, line.SettlementAmount, err))
+				}
 			}
 
-			if line.CreditAmount != nil {
-				netTotal = netTotal.Sub(line.CreditAmount.Decimal)
-				//grossTotal = grossTotal.Sub(decimal.Decimal(*line.CreditAmount))
+			hasDebit := line.DebitAmount != ""
+			hasCredit := line.CreditAmount != ""
+
+			if hasDebit {
+				if _, err := parseDecimalPayments(line.DebitAmount); err != nil {
+					errs = append(errs, fmt.Errorf("%s: DebitAmount '%s' is not a valid decimal: %v", lineIdentifier, line.DebitAmount, err))
+					hasDebit = false // Consider it not validly provided
+				}
+			}
+			if hasCredit {
+				if _, err := parseDecimalPayments(line.CreditAmount); err != nil {
+					errs = append(errs, fmt.Errorf("%s: CreditAmount '%s' is not a valid decimal: %v", lineIdentifier, line.CreditAmount, err))
+					hasCredit = false // Consider it not validly provided
+				}
 			}
 
-			//  get the tax amount
-			if line.Tax != nil && line.Tax.TaxPercentage != nil {
-				taxMultiplier := (*line.Tax.TaxPercentage).Div(decimal.NewFromInt(100)).Add(decimal.NewFromInt(1))
-				grossTotal = grossTotal.Add(netTotal.Div(taxMultiplier))
-			} else if line.Tax != nil && line.Tax.TaxAmount != nil {
-				grossTotal = grossTotal.Add(netTotal.Add(line.Tax.TaxAmount.Decimal))
+			if !hasDebit && !hasCredit {
+				errs = append(errs, fmt.Errorf("%s: Either DebitAmount or CreditAmount must be provided and valid", lineIdentifier))
+			}
+			// Note: SAFT rules might restrict having both Debit and Credit amount on the same payment line. Not checked here.
+
+			// Tax Validation (Line.Tax) - if provided
+			if line.Tax != nil {
+				tax := line.Tax
+				validTaxTypes := map[string]bool{"IVA": true, "IS": true, "NS": true}
+				if _, ok := validTaxTypes[tax.TaxType]; !ok {
+					errs = append(errs, fmt.Errorf("%s: Tax.TaxType '%s' is invalid", lineIdentifier, tax.TaxType))
+				}
+				if !countryCodeRegexPayments.MatchString(tax.TaxCountryRegion) {
+					errs = append(errs, fmt.Errorf("%s: Tax.TaxCountryRegion '%s' is not a valid country code", lineIdentifier, tax.TaxCountryRegion))
+				}
+				if tax.TaxCode == "" {
+					errs = append(errs, fmt.Errorf("%s: Tax.TaxCode is required", lineIdentifier))
+				}
+
+				hasTaxPercentage := tax.TaxPercentage != "" && tax.TaxPercentage != "0"
+				hasTaxAmount := tax.TaxAmount != "" && tax.TaxAmount != "0"
+
+				if tax.TaxPercentage != "" {
+					if _, err := parseDecimalPayments(tax.TaxPercentage); err != nil {
+						errs = append(errs, fmt.Errorf("%s: Tax.TaxPercentage '%s' is not a valid decimal: %v", lineIdentifier, tax.TaxPercentage, err))
+						hasTaxPercentage = false
+					}
+				}
+				if tax.TaxAmount != "" {
+					 if _, err := parseDecimalPayments(tax.TaxAmount); err != nil {
+						errs = append(errs, fmt.Errorf("%s: Tax.TaxAmount '%s' is not a valid decimal: %v", lineIdentifier, tax.TaxAmount, err))
+						hasTaxAmount = false
+					}
+				}
+
+				if tax.TaxType == "IVA" && !hasTaxPercentage && !hasTaxAmount {
+                     errs = append(errs, fmt.Errorf("%s: For TaxType IVA, either TaxPercentage or TaxAmount must be provided and valid", lineIdentifier))
+                } else if tax.TaxType == "IVA" && tax.TaxPercentage == "" && tax.TaxAmount == "" {
+					errs = append(errs, fmt.Errorf("%s: For TaxType IVA, either TaxPercentage or TaxAmount must be provided", lineIdentifier))
+				}
+			}
+		} // End Line Validation
+
+		// DocumentTotals Validation
+		if payment.DocumentTotals == nil {
+			errs = append(errs, fmt.Errorf("%s: DocumentTotals is required", pIdentifier))
+		} else {
+			dt := payment.DocumentTotals
+			if _, err := parseDecimalPayments(dt.TaxPayable); err != nil {
+				errs = append(errs, fmt.Errorf("%s: DocumentTotals.TaxPayable '%s' is not a valid decimal: %v", pIdentifier, dt.TaxPayable, err))
+			}
+			if _, err := parseDecimalPayments(dt.NetTotal); err != nil {
+				errs = append(errs, fmt.Errorf("%s: DocumentTotals.NetTotal '%s' is not a valid decimal: %v", pIdentifier, dt.NetTotal, err))
+			}
+			if _, err := parseDecimalPayments(dt.GrossTotal); err != nil {
+				errs = append(errs, fmt.Errorf("%s: DocumentTotals.GrossTotal '%s' is not a valid decimal: %v", pIdentifier, dt.GrossTotal, err))
 			}
 
-			if line.SettlementAmount != nil {
-				settlementTotal = settlementTotal.Add(line.SettlementAmount.Decimal)
+			if dt.Settlement != nil && dt.Settlement.SettlementAmount != "" { // If Settlement block exists and amount is provided
+				if _, err := parseDecimalPayments(dt.Settlement.SettlementAmount); err != nil {
+					errs = append(errs, fmt.Errorf("%s: DocumentTotals.Settlement.SettlementAmount '%s' is not a valid decimal: %v", pIdentifier, dt.Settlement.SettlementAmount, err))
+				}
 			}
-		}
 
-		// Check if the net total and gross total are correct
-		if payment.DocumentTotals.NetTotal.Cmp(netTotal) != 0 {
-			return fmt.Errorf("saft: invalid Payment.DocumentTotals.NetTotal: %s != calculated %s", payment.DocumentTotals.NetTotal, netTotal)
-		}
-		if payment.DocumentTotals.GrossTotal.Cmp(grossTotal) != 0 {
-			return fmt.Errorf("saft: invalid Payment.DocumentTotals.GrossTotal: %s != calculated %s", payment.DocumentTotals.GrossTotal, grossTotal)
-		}
-
-		// Check Settlement
-		if settlementTotal.GreaterThan(decimal.Zero) && payment.DocumentTotals.Settlement == nil {
-			return fmt.Errorf("saft: missing Payment.DocumentTotals.Settlement when settlementTotal is greater than zero")
-		}
-		if payment.DocumentTotals.Settlement != nil {
-			if payment.DocumentTotals.Settlement.SettlementAmount.Cmp(settlementTotal) != 0 {
-				return fmt.Errorf("saft: invalid Payment.DocumentTotals.Settlement.SettlementAmount: %s != calculated %s", payment.DocumentTotals.Settlement.SettlementAmount, settlementTotal)
+			if dt.Currency != nil && dt.Currency.CurrencyCode != "" {
+				if !currencyCodeRegexPayments.MatchString(dt.Currency.CurrencyCode) {
+					errs = append(errs, fmt.Errorf("%s: DocumentTotals.Currency.CurrencyCode '%s' is invalid", pIdentifier, dt.Currency.CurrencyCode))
+				}
+				if _, err := parseDecimalPayments(dt.Currency.CurrencyAmount); err != nil {
+					errs = append(errs, fmt.Errorf("%s: DocumentTotals.Currency.CurrencyAmount '%s' is not a valid decimal: %v", pIdentifier, dt.Currency.CurrencyAmount, err))
+				}
 			}
-		}
-
-		// Check Currency
-		if payment.DocumentTotals.Currency != nil && a.Header.CurrencyCode == "EUR" {
-			return fmt.Errorf("saft: invalid Payment.DocumentTotals.Currency: %s, Header.CurrencyCode must not be EUR", payment.DocumentTotals.Currency.CurrencyCode)
-		}
-
-		if payment.DocumentTotals.Currency == nil && a.Header.CurrencyCode != "EUR" {
-			return fmt.Errorf("saft: missing Payment.DocumentTotals.Currency when Header.CurrencyCode is not EUR")
-		}
-
-		if payment.DocumentTotals.Currency != nil {
-
 		}
 	}
-	return nil
+	return errs
 }
