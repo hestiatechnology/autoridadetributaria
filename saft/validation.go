@@ -62,15 +62,15 @@ func (a *AuditFile) checkCommon() error {
 		return err
 	} */
 
-	if err := a.checkCustomers(); err != nil {
+	/*if err := a.checkCustomers(); err != nil {
 		return err
-	}
+	}*/
 
 	// TODO: Check TaxTable
 
-	if err := a.checkPayments(); err != nil {
+	/*if err := a.checkPayments(); err != nil {
 		return err
-	}
+	}*/
 	return nil
 }
 
@@ -201,7 +201,7 @@ func (a *AuditFile) checkHeader() error {
 
 //func (a *AuditFile) checkCustomers() error {}
 
-func (a *AuditFile) checkPayments() error {}
+//func (a *AuditFile) checkPayments() error {}
 
 func (a *AuditFile) checkConstraints() error {
 	// Master Files Constraints
