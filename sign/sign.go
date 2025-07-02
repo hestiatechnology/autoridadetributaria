@@ -20,7 +20,7 @@ func CheckPrivateKeyDetails(pemData []byte) (bool, error) {
 	// dentro de um container de texto (geralmente ASCII/UTF-8).
 	block, _ := pem.Decode(pemData)
 	if block == nil {
-		return false, errors.New("falha ao decodificar o bloco PEM. A chave não está em formato PEM válido")
+		return false, errors.New("failure decoding PEM block")
 	}
 
 	// 2. Tentar parsear a chave. O pacote x509 lida com o formato DER (ASN.1)
@@ -31,7 +31,7 @@ func CheckPrivateKeyDetails(pemData []byte) (bool, error) {
 		// Se falhar, tentamos o formato legado PKCS#1, específico para RSA.
 		parsedKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
 		if err != nil {
-			return false, fmt.Errorf("falha ao parsear a chave privada (nem PKCS#8 nem PKCS#1): %v", err)
+			return false, fmt.Errorf("failure parsing private key (neither PKCS#8 nor PKCS#1): %v", err)
 		}
 	}
 
@@ -51,6 +51,27 @@ func CheckPrivateKeyDetails(pemData []byte) (bool, error) {
 		// Se a chave for de outro tipo (ex: ECDSA, Ed25519), não atende ao requisito de tamanho.
 		return false, fmt.Errorf("a chave não é do tipo RSA, mas sim %T", parsedKey)
 	}
+}
+
+func LoadPrivateKey(privateKeyStr string) (*rsa.PrivateKey, error) {
+	block, _ := pem.Decode([]byte(privateKeyStr))
+	if block == nil {
+		return nil, errors.New("failure decoding PEM block")
+	}
+
+	// 2. Tentar parsear a chave. O pacote x509 lida com o formato DER (ASN.1)
+	// que está codificado em Base64 no PEM.
+	// Primeiro, tentamos o formato moderno PKCS#8.
+	parsedKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		// Se falhar, tentamos o formato legado PKCS#1, específico para RSA.
+		parsedKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, fmt.Errorf("failure parsing private key (neither PKCS#8 nor PKCS#1): %v", err)
+		}
+	}
+
+	return parsedKey.(*rsa.PrivateKey), nil
 }
 
 type Document struct {
