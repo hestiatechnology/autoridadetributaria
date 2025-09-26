@@ -2258,18 +2258,8 @@ const (
 )
 
 const (
-	SelfBillingIndicatorNo  uint32 = 0
-	SelfBillingIndicatorYes uint32 = 1
-)
-
-const (
-	CashVatschemeIndicatorNo  uint32 = 0
-	CashVatschemeIndicatorYes uint32 = 1
-)
-
-const (
-	ThirdPartiesBillingIndicatorNo  uint32 = 0
-	ThirdPartiesBillingIndicatorYes uint32 = 1
+	IndicatorNo  uint32 = 0
+	IndicatorYes uint32 = 1
 )
 
 const (

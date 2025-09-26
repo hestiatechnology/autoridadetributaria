@@ -41,7 +41,7 @@ func (a *AuditFile) Validate() error {
 	}
 
 	for _, invoice := range a.SourceDocuments.SalesInvoices.Invoice {
-		if invoice.SpecialRegimes.CashVatschemeIndicator != CashVatschemeIndicatorNo && invoice.SpecialRegimes.CashVatschemeIndicator != CashVatschemeIndicatorYes {
+		if invoice.SpecialRegimes.CashVatschemeIndicator != IndicatorNo && invoice.SpecialRegimes.CashVatschemeIndicator != IndicatorYes {
 			return fmt.Errorf("saft: invalid CashVatschemeIndicator: %d", invoice.SpecialRegimes.CashVatschemeIndicator)
 		}
 	}

@@ -70,7 +70,7 @@ func ValidateCustomers(a *saft.AuditFile) error {
 			}
 		}
 
-		if customer.SelfBillingIndicator != saft.SelfBillingIndicatorNo && customer.SelfBillingIndicator != saft.SelfBillingIndicatorYes {
+		if customer.SelfBillingIndicator != saft.IndicatorNo && customer.SelfBillingIndicator != saft.IndicatorYes {
 			return fmt.Errorf("saft: invalid Customer.SelfBillingIndicator: %d", customer.SelfBillingIndicator)
 		}
 	}
