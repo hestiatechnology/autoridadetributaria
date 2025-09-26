@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8 "?>
+<?xml version="1.0" encoding="UTF-8"?>
 <AuditFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:OECD:StandardAuditFile-Tax:PT_1.04_01 ../saftpt1.04_01.xsd" xmlns="urn:OECD:StandardAuditFile-Tax:PT_1.04_01">
   <Header>
     <AuditFileVersion>1.04_01</AuditFileVersion>

@@ -110,7 +110,7 @@ type Customer struct {
 
 	Website *SafpttextTypeMandatoryMax60Car `xml:"Website"`
 
-	SelfBillingIndicator uint64 `xml:"SelfBillingIndicator"`
+	SelfBillingIndicator uint32 `xml:"SelfBillingIndicator"`
 }
 
 // Element
@@ -139,7 +139,7 @@ type Supplier struct {
 
 	Website *SafpttextTypeMandatoryMax60Car `xml:"Website"`
 
-	SelfBillingIndicator string `xml:"SelfBillingIndicator"`
+	SelfBillingIndicator uint32 `xml:"SelfBillingIndicator"`
 }
 
 // Element
@@ -1440,7 +1440,7 @@ type SalesInvoicesInvoice struct {
 
 	HashControl SafpthashControl `xml:"HashControl"`
 
-	Period string `xml:"Period"`
+	Period *uint `xml:"Period"`
 
 	InvoiceDate SafdateType `xml:"InvoiceDate"`
 
@@ -1996,11 +1996,11 @@ type ShippingPointStructure struct {
 type SpecialRegimes struct {
 	//XMLName xml.Name
 
-	SelfBillingIndicator string `xml:"SelfBillingIndicator"`
+	SelfBillingIndicator uint32 `xml:"SelfBillingIndicator"`
 
-	CashVatschemeIndicator uint `xml:"CashVATSchemeIndicator"`
+	CashVatschemeIndicator uint32 `xml:"CashVATSchemeIndicator"`
 
-	ThirdPartiesBillingIndicator string `xml:"ThirdPartiesBillingIndicator"`
+	ThirdPartiesBillingIndicator uint32 `xml:"ThirdPartiesBillingIndicator"`
 }
 
 type Tax struct {
@@ -2245,11 +2245,6 @@ type Safptunnumber string
 
 type TaxTableEntryTaxCode string
 
-const (
-	CashVatschemeIndicatorYes uint = 1
-	CashVatschemeIndicatorNo  uint = 0
-)
-
 // Saft types
 const (
 	SaftAccounting            = "C"
@@ -2262,8 +2257,20 @@ const (
 	SaftTransportDocuments    = "T"
 )
 
-const SelfBillingIndicatorNo = 0
-const SelfBillingIndicatorYes = 1
+const (
+	SelfBillingIndicatorNo  uint32 = 0
+	SelfBillingIndicatorYes uint32 = 1
+)
+
+const (
+	CashVatschemeIndicatorNo  uint32 = 0
+	CashVatschemeIndicatorYes uint32 = 1
+)
+
+const (
+	ThirdPartiesBillingIndicatorNo  uint32 = 0
+	ThirdPartiesBillingIndicatorYes uint32 = 1
+)
 
 const (
 	PaymentStatusNormal    = "N"
