@@ -1432,7 +1432,9 @@ func (i *InvoiceDocumentTotals) MarshalXML(e *xml.Encoder, start xml.StartElemen
 	i.NetTotal = SafmonetaryType{i.NetTotal.Round(2)}
 	i.GrossTotal = SafmonetaryType{i.GrossTotal.Round(2)}
 
-	return e.EncodeElement(i, start)
+	// Create an alias to avoid recursion
+	type Alias InvoiceDocumentTotals
+	return e.EncodeElement((*Alias)(i), start)
 }
 
 // Element
