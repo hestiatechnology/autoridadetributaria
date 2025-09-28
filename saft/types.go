@@ -1440,7 +1440,7 @@ type SalesInvoicesInvoice struct {
 
 	HashControl SafpthashControl `xml:"HashControl"`
 
-	Period *uint `xml:"Period"`
+	Period uint `xml:"Period,omitempty"`
 
 	InvoiceDate SafdateType `xml:"InvoiceDate"`
 
@@ -1450,7 +1450,7 @@ type SalesInvoicesInvoice struct {
 
 	SourceId SafpttextTypeMandatoryMax30Car `xml:"SourceID"`
 
-	Eaccode string `xml:"EACCode"`
+	Eaccode string `xml:"EACCode,omitempty"`
 
 	SystemEntryDate SafdateTimeType `xml:"SystemEntryDate"`
 
