@@ -12,10 +12,10 @@ import (
 
 // Element
 type AuditFile struct {
-	XMLName           xml.Name `xml:"urn:OECD:StandardAuditFile-Tax:PT_1.04_01 AuditFile"`
-	XmlnsXsi          string   `xml:"xmlns:xsi,attr"`
-	XmlnsXsd          string   `xml:"xmlns:xsd,attr"`
-	XsiSchemaLocation string   `xml:"xsi:schemaLocation,attr"`
+	XMLName  xml.Name `xml:"urn:OECD:StandardAuditFile-Tax:PT_1.04_01 AuditFile"`
+	XmlnsXsi string   `xml:"xmlns:xsi,attr"`
+	XmlnsXsd string   `xml:"xmlns:xsd,attr"`
+	//XsiSchemaLocation string   `xml:"xsi:schemaLocation,attr"`
 
 	Header Header `xml:"Header"`
 
