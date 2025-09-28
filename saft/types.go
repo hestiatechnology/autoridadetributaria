@@ -2211,33 +2211,153 @@ type SafpttaxonomyCode uint64
 
 type SafpttextTypeMandatoryMax10Car string
 
+func (s SafpttextTypeMandatoryMax10Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 10 {
+		// truncate to 10 characters
+		s = s[:10]
+	}
+	return e.EncodeElement(string(s), start)
+}
+
 type SafpttextTypeMandatoryMax20Car string
+
+func (s SafpttextTypeMandatoryMax20Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 20 {
+		// truncate to 20 characters
+		s = s[:20]
+	}
+	return e.EncodeElement(string(s), start)
+}
 
 type SafpttextTypeMandatoryMax21Car string
 
+func (s SafpttextTypeMandatoryMax21Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 21 {
+		// truncate to 21 characters
+		s = s[:21]
+	}
+	return e.EncodeElement(string(s), start)
+}
+
 type SafpttextTypeMandatoryMax30Car string
+
+func (s SafpttextTypeMandatoryMax30Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 30 {
+		// truncate to 30 characters
+		s = s[:30]
+	}
+	return e.EncodeElement(string(s), start)
+}
 
 type SafpttextTypeMandatoryMax35Car string
 
+func (s SafpttextTypeMandatoryMax35Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 35 {
+		// truncate to 35 characters
+		s = s[:35]
+	}
+	return e.EncodeElement(string(s), start)
+}
+
 type SafpttextTypeMandatoryMax50Car string
+
+func (s SafpttextTypeMandatoryMax50Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 50 {
+		// truncate to 50 characters
+		s = s[:50]
+	}
+	return e.EncodeElement(string(s), start)
+}
 
 type SafpttextTypeMandatoryMax60Car string
 
+func (s SafpttextTypeMandatoryMax60Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 60 {
+		// truncate to 60 characters
+		s = s[:60]
+	}
+	return e.EncodeElement(string(s), start)
+}
+
 type SafpttextTypeMandatoryMax70Car string
+
+func (s SafpttextTypeMandatoryMax70Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 70 {
+		// truncate to 70 characters
+		s = s[:70]
+	}
+	return e.EncodeElement(string(s), start)
+}
 
 type SafpttextTypeMandatoryMax90Car string
 
+func (s SafpttextTypeMandatoryMax90Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 90 {
+		// truncate to 90 characters
+		s = s[:90]
+	}
+	return e.EncodeElement(string(s), start)
+}
+
 type SafpttextTypeMandatoryMax100Car string
+
+func (s SafpttextTypeMandatoryMax100Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 100 {
+		// truncate to 100 characters
+		s = s[:100]
+	}
+	return e.EncodeElement(string(s), start)
+}
 
 type SafpttextTypeMandatoryMax172Car string
 
+func (s SafpttextTypeMandatoryMax172Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 172 {
+		// truncate to 172 characters
+		s = s[:172]
+	}
+	return e.EncodeElement(string(s), start)
+}
+
 type SafpttextTypeMandatoryMax200Car string
+
+func (s SafpttextTypeMandatoryMax200Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 200 {
+		// truncate to 200 characters
+		s = s[:200]
+	}
+	return e.EncodeElement(string(s), start)
+}
 
 type SafpttextTypeMandatoryMax210Car string
 
+func (s SafpttextTypeMandatoryMax210Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 210 {
+		// truncate to 210 characters
+		s = s[:210]
+	}
+	return e.EncodeElement(string(s), start)
+}
+
 type SafpttextTypeMandatoryMax255Car string
 
+func (s SafpttextTypeMandatoryMax255Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 255 {
+		// truncate to 255 characters
+		s = s[:255]
+	}
+	return e.EncodeElement(string(s), start)
+}
+
 type SafpttextTypeMandatoryMax254Car string
+
+func (s SafpttextTypeMandatoryMax254Car) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(s) > 254 {
+		// truncate to 254 characters
+		s = s[:254]
+	}
+	return e.EncodeElement(string(s), start)
+}
 
 type SafpttransactionId string
 
