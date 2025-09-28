@@ -1359,7 +1359,7 @@ type InvoiceDocumentStatus struct {
 
 	InvoiceStatusDate SafdateTimeType `xml:"InvoiceStatusDate"`
 
-	Reason *SafpttextTypeMandatoryMax50Car `xml:"Reason"`
+	Reason SafpttextTypeMandatoryMax50Car `xml:"Reason,omitempty"`
 
 	SourceId SafpttextTypeMandatoryMax30Car `xml:"SourceID"`
 
