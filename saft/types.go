@@ -1426,6 +1426,15 @@ type InvoiceDocumentTotals struct {
 	Payment []PaymentMethod `xml:"Payment"`
 }
 
+func (i *InvoiceDocumentTotals) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Round the monetary values to 2 decimal places
+	i.TaxPayable = SafmonetaryType{i.TaxPayable.Round(2)}
+	i.NetTotal = SafmonetaryType{i.NetTotal.Round(2)}
+	i.GrossTotal = SafmonetaryType{i.GrossTotal.Round(2)}
+
+	return e.EncodeElement(i, start)
+}
+
 // Element
 type SalesInvoicesInvoice struct {
 	XMLName xml.Name `xml:"Invoice"`
