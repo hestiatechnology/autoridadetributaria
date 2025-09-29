@@ -1576,7 +1576,7 @@ type MovementOfGoodsStockMovement struct {
 
 	HashControl SafpthashControl `xml:"HashControl"`
 
-	Period string `xml:"Period"`
+	Period uint `xml:"Period"`
 
 	MovementDate SafdateType `xml:"MovementDate"`
 
@@ -1707,7 +1707,7 @@ type WorkingDocumentsWorkDocument struct {
 
 	HashControl SafpthashControl `xml:"HashControl"`
 
-	Period string `xml:"Period"`
+	Period uint `xml:"Period"`
 
 	WorkDate SafdateType `xml:"WorkDate"`
 
@@ -1818,7 +1818,7 @@ type PaymentsPayment struct {
 
 	Atcud SafpttextTypeMandatoryMax100Car `xml:"ATCUD"`
 
-	Period string `xml:"Period"`
+	Period uint `xml:"Period"`
 
 	TransactionId *SafpttransactionId `xml:"TransactionID"`
 
