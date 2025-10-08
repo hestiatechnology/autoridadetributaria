@@ -91,6 +91,7 @@ func SignDocument(key *rsa.PrivateKey, document Document) ([]byte, error) {
 	hasher := sha1.New()
 	hasher.Write([]byte(strToEncode))
 	hashed := hasher.Sum(nil)
+	fmt.Printf("SHA-1 Hash: %x\n", hashed)
 
 	// Passo 2: Assinar o hash com a chave privada (RSA-PKCS1v15)
 	//rsa.Sign
@@ -98,10 +99,12 @@ func SignDocument(key *rsa.PrivateKey, document Document) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("erro ao assinar o documento: %w", err)
 	}
+	fmt.Printf("Signature (raw bytes): %x\n", signature)
 
 	// Passo 3: Codificar a assinatura em Base64
 	encodedSignature := make([]byte, base64.StdEncoding.EncodedLen(len(signature)))
 	base64.StdEncoding.Encode(encodedSignature, signature)
+	fmt.Printf("Signature (Base64): %s\n", encodedSignature)
 
 	return encodedSignature, nil
 }
