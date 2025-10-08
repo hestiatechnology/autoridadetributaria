@@ -85,6 +85,8 @@ type Document struct {
 func SignDocument(key *rsa.PrivateKey, document Document) ([]byte, error) {
 	strToEncode := fmt.Sprintf("%s;%s;%s;%s;%s", document.Date.Format("2006-01-02"), document.SystemEntryDate.Format("2006-01-02T15:04:05"), document.DocumentNo, document.GrossTotal.String(), document.Hash)
 
+	fmt.Printf("String to sign: %s\n", strToEncode)
+
 	// Passo 1: Calcular o hash SHA-1 da string
 	hasher := sha1.New()
 	hasher.Write([]byte(strToEncode))
