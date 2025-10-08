@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
-	"golang.org/x/text/encoding/charmap"
 )
 
 func CheckPrivateKeyDetails(pemData []byte) (bool, error) {
@@ -84,19 +83,13 @@ type Document struct {
 }
 
 func SignDocument(key *rsa.PrivateKey, document Document) ([]byte, error) {
-	strToSign := fmt.Sprintf("%s;%s;%s;%s;%s", document.Date.Format("2006-01-02"), document.SystemEntryDate.Format("2006-01-02T15:04:05"), document.DocumentNo, document.GrossTotal.StringFixed(2), document.Hash)
+	strToEncode := fmt.Sprintf("%s;%s;%s;%s;%s", document.Date.Format("2006-01-02"), document.SystemEntryDate.Format("2006-01-02T15:04:05"), document.DocumentNo, document.GrossTotal.StringFixed(2), document.Hash)
 
-	fmt.Printf("String to sign: %s\n", strToSign)
-
-	encoder := charmap.Windows1252.NewEncoder()
-	bytesToSign, err := encoder.Bytes([]byte(strToSign))
-	if err != nil {
-		return nil, fmt.Errorf("erro ao codificar a string para Windows-1252: %w", err)
-	}
+	fmt.Printf("String to sign: %s\n", strToEncode)
 
 	// Passo 1: Calcular o hash SHA-1 da string
 	hasher := sha1.New()
-	hasher.Write([]byte(bytesToSign))
+	hasher.Write([]byte(strToEncode))
 	hashed := hasher.Sum(nil)
 	fmt.Printf("SHA-1 Hash: %x\n", hashed)
 
