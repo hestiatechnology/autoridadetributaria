@@ -1322,6 +1322,11 @@ type JournalTransaction struct {
 
 	TransactionDate SafdateType `xml:"TransactionDate"`
 
+	// Either CustomerId or SupplierId must be present
+	CustomerId *SafpttextTypeMandatoryMax30Car `xml:"CustomerID"`
+	// Either CustomerId or SupplierId must be present
+	SupplierId *SafpttextTypeMandatoryMax30Car `xml:"SupplierID"`
+
 	SourceId SafpttextTypeMandatoryMax30Car `xml:"SourceID"`
 
 	Description SafpttextTypeMandatoryMax200Car `xml:"Description"`
@@ -1333,11 +1338,6 @@ type JournalTransaction struct {
 	GlpostingDate SafdateType `xml:"GLPostingDate"`
 
 	Lines TransactionLines `xml:"Lines"`
-
-	// Either CustomerId or SupplierId must be present
-	CustomerId *SafpttextTypeMandatoryMax30Car `xml:"CustomerID"`
-	// Either CustomerId or SupplierId must be present
-	SupplierId *SafpttextTypeMandatoryMax30Car `xml:"SupplierID"`
 }
 
 // Element
@@ -1586,6 +1586,10 @@ type MovementOfGoodsStockMovement struct {
 
 	TransactionId *SafpttransactionId `xml:"TransactionID"`
 
+	CustomerId *SafpttextTypeMandatoryMax30Car `xml:"CustomerID"`
+
+	SupplierId *SafpttextTypeMandatoryMax30Car `xml:"SupplierID"`
+
 	SourceId SafpttextTypeMandatoryMax30Car `xml:"SourceID"`
 
 	Eaccode string `xml:"EACCode,omitempty"`
@@ -1605,10 +1609,6 @@ type MovementOfGoodsStockMovement struct {
 	Line []StockMovementLine `xml:"Line"`
 
 	DocumentTotals StockMovementDocumentTotals `xml:"DocumentTotals"`
-
-	CustomerId *SafpttextTypeMandatoryMax30Car `xml:"CustomerID"`
-
-	SupplierId *SafpttextTypeMandatoryMax30Car `xml:"SupplierID"`
 }
 
 // Element
