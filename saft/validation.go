@@ -340,8 +340,9 @@ func (a *AuditFile) checkConstraints() error {
 		documents := make(map[string]bool)
 		for _, stock := range a.SourceDocuments.MovementOfGoods.StockMovement {
 			// DocumentNumberConstraint
-			if _, ok := documents[stock.DocumentNumber]; !ok {
-				//return errcodes.ErrUQDocumentNo
+			// DocumentNumberConstraint
+			if _, ok := documents[stock.DocumentNumber]; ok {
+				// If already in map, it's a duplicate - return error
 				return fmt.Errorf("saft: unique constraint violated on MovementOfGoods.StockMovement.DocumentNumber: %s", stock.DocumentNumber)
 			}
 			documents[stock.DocumentNumber] = true
