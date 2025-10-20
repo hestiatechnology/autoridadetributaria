@@ -377,7 +377,7 @@ func (a *AuditFile) checkConstraints() error {
 		workDocs := make(map[string]bool)
 		for _, workDoc := range a.SourceDocuments.WorkingDocuments.WorkDocument {
 			// WorkDocumentDocumentNumberConstraint
-			if _, ok := workDocs[workDoc.DocumentNumber]; !ok {
+			if _, ok := workDocs[workDoc.DocumentNumber]; ok {
 				//return errcodes.ErrUQWorkDocNo
 				return fmt.Errorf("saft: unique constraint violated on WorkingDocuments.WorkDocument.DocumentNumber: %s", workDoc.DocumentNumber)
 			}
