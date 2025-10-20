@@ -1562,6 +1562,17 @@ type StockMovementDocumentTotals struct {
 	Currency *Currency `xml:"Currency"`
 }
 
+func (i *StockMovementDocumentTotals) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Round the monetary values to 2 decimal places
+	i.TaxPayable = SafmonetaryType{i.TaxPayable.Round(2)}
+	i.NetTotal = SafmonetaryType{i.NetTotal.Round(2)}
+	i.GrossTotal = SafmonetaryType{i.GrossTotal.Round(2)}
+
+	// Create an alias to avoid recursion
+	type Alias StockMovementDocumentTotals
+	return e.EncodeElement((*Alias)(i), start)
+}
+
 // Element
 type MovementOfGoodsStockMovement struct {
 	XMLName xml.Name `xml:"StockMovement"`
@@ -1691,6 +1702,17 @@ type WorkDocumentDocumentTotals struct {
 	GrossTotal SafmonetaryType `xml:"GrossTotal"`
 
 	Currency *Currency `xml:"Currency"`
+}
+
+func (i *WorkDocumentDocumentTotals) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Round the monetary values to 2 decimal places
+	i.TaxPayable = SafmonetaryType{i.TaxPayable.Round(2)}
+	i.NetTotal = SafmonetaryType{i.NetTotal.Round(2)}
+	i.GrossTotal = SafmonetaryType{i.GrossTotal.Round(2)}
+
+	// Create an alias to avoid recursion
+	type Alias WorkDocumentDocumentTotals
+	return e.EncodeElement((*Alias)(i), start)
 }
 
 // Element
