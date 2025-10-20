@@ -1534,6 +1534,10 @@ type StockMovementLine struct {
 
 	ProductSerialNumber *ProductSerialNumber `xml:"ProductSerialNumber"`
 
+	DebitAmount *SafmonetaryType `xml:"DebitAmount"`
+
+	CreditAmount *SafmonetaryType `xml:"CreditAmount"`
+
 	Tax *MovementTax `xml:"Tax"`
 
 	TaxExemptionReason *SafptportugueseTaxExemptionReason `xml:"TaxExemptionReason"`
@@ -1543,10 +1547,6 @@ type StockMovementLine struct {
 	SettlementAmount *SafmonetaryType `xml:"SettlementAmount"`
 
 	CustomsInformation *CustomsInformation `xml:"CustomsInformation"`
-
-	DebitAmount *SafmonetaryType `xml:"DebitAmount"`
-
-	CreditAmount *SafmonetaryType `xml:"CreditAmount"`
 }
 
 // Element
@@ -1665,6 +1665,10 @@ type WorkDocumentLine struct {
 
 	ProductSerialNumber *ProductSerialNumber `xml:"ProductSerialNumber"`
 
+	DebitAmount *SafmonetaryType `xml:"DebitAmount"`
+
+	CreditAmount *SafmonetaryType `xml:"CreditAmount"`
+
 	Tax *Tax `xml:"Tax"`
 
 	TaxExemptionReason *SafptportugueseTaxExemptionReason `xml:"TaxExemptionReason"`
@@ -1674,10 +1678,6 @@ type WorkDocumentLine struct {
 	SettlementAmount *SafmonetaryType `xml:"SettlementAmount"`
 
 	CustomsInformation *CustomsInformation `xml:"CustomsInformation"`
-
-	DebitAmount *SafmonetaryType `xml:"DebitAmount"`
-
-	CreditAmount *SafmonetaryType `xml:"CreditAmount"`
 }
 
 // Element
