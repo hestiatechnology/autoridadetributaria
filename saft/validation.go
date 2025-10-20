@@ -348,15 +348,19 @@ func (a *AuditFile) checkConstraints() error {
 			documents[stock.DocumentNumber] = true
 
 			// StockMovementCustomerIDConstraint
-			if _, ok := customers[*stock.CustomerId]; !ok {
-				//return errcodes.ErrKRStockMovementCustomerID
-				return fmt.Errorf("saft: key reference violated on MovementOfGoods.StockMovement.CustomerId: %s", *stock.CustomerId)
+			if stock.CustomerId != nil {
+				if _, ok := customers[*stock.CustomerId]; !ok {
+					//return errcodes.ErrKRStockMovementCustomerID
+					return fmt.Errorf("saft: key reference violated on MovementOfGoods.StockMovement.CustomerId: %s", *stock.CustomerId)
+				}
 			}
 
 			// StockMovementSupplierIDConstraint
-			if _, ok := suppliers[*stock.SupplierId]; !ok {
-				//return errcodes.ErrKRStockMovementSupplierID
-				return fmt.Errorf("saft: key reference violated on MovementOfGoods.StockMovement.SupplierId: %s", *stock.SupplierId)
+			if stock.SupplierId != nil {
+				if _, ok := suppliers[*stock.SupplierId]; !ok {
+					//return errcodes.ErrKRStockMovementSupplierID
+					return fmt.Errorf("saft: key reference violated on MovementOfGoods.StockMovement.SupplierId: %s", *stock.SupplierId)
+				}
 			}
 
 			// StockMovementProductCodeConstraint
