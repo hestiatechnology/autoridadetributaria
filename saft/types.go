@@ -1588,7 +1588,7 @@ type MovementOfGoodsStockMovement struct {
 
 	SourceId SafpttextTypeMandatoryMax30Car `xml:"SourceID"`
 
-	Eaccode string `xml:"EACCode"`
+	Eaccode string `xml:"EACCode,omitempty"`
 
 	MovementComments *SafpttextTypeMandatoryMax60Car `xml:"MovementComments"`
 
@@ -1715,7 +1715,7 @@ type WorkingDocumentsWorkDocument struct {
 
 	SourceId SafpttextTypeMandatoryMax30Car `xml:"SourceID"`
 
-	Eaccode string `xml:"EACCode"`
+	Eaccode string `xml:"EACCode,omitempty"`
 
 	SystemEntryDate SafdateTimeType `xml:"SystemEntryDate"`
 
