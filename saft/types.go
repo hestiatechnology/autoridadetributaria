@@ -1427,14 +1427,26 @@ type InvoiceDocumentTotals struct {
 }
 
 func (i *InvoiceDocumentTotals) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	// Round the monetary values to 2 decimal places
-	i.TaxPayable = SafmonetaryType{i.TaxPayable.Round(2)}
-	i.NetTotal = SafmonetaryType{i.NetTotal.Round(2)}
-	i.GrossTotal = SafmonetaryType{i.GrossTotal.Round(2)}
+	// Create a temporary struct with string values for monetary fields to ensure exactly 2 decimal places
+	temp := struct {
+		XMLName    xml.Name        `xml:"DocumentTotals"`
+		TaxPayable string          `xml:"TaxPayable"`
+		NetTotal   string          `xml:"NetTotal"`
+		GrossTotal string          `xml:"GrossTotal"`
+		Currency   *Currency       `xml:"Currency"`
+		Settlement []Settlement    `xml:"Settlement"`
+		Payment    []PaymentMethod `xml:"Payment"`
+	}{
+		XMLName:    xml.Name{Local: "DocumentTotals"},
+		TaxPayable: i.TaxPayable.Round(2).StringFixed(2),
+		NetTotal:   i.NetTotal.Round(2).StringFixed(2),
+		GrossTotal: i.GrossTotal.Round(2).StringFixed(2),
+		Currency:   i.Currency,
+		Settlement: i.Settlement,
+		Payment:    i.Payment,
+	}
 
-	// Create an alias to avoid recursion
-	type Alias InvoiceDocumentTotals
-	return e.EncodeElement((*Alias)(i), start)
+	return e.EncodeElement(temp, start)
 }
 
 // Element
@@ -1563,14 +1575,22 @@ type StockMovementDocumentTotals struct {
 }
 
 func (i *StockMovementDocumentTotals) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	// Round the monetary values to 2 decimal places
-	i.TaxPayable = SafmonetaryType{i.TaxPayable.Round(2)}
-	i.NetTotal = SafmonetaryType{i.NetTotal.Round(2)}
-	i.GrossTotal = SafmonetaryType{i.GrossTotal.Round(2)}
+	// Create a temporary struct with string values for monetary fields to ensure exactly 2 decimal places
+	temp := struct {
+		XMLName    xml.Name  `xml:"DocumentTotals"`
+		TaxPayable string    `xml:"TaxPayable"`
+		NetTotal   string    `xml:"NetTotal"`
+		GrossTotal string    `xml:"GrossTotal"`
+		Currency   *Currency `xml:"Currency"`
+	}{
+		XMLName:    xml.Name{Local: "DocumentTotals"},
+		TaxPayable: i.TaxPayable.Round(2).StringFixed(2),
+		NetTotal:   i.NetTotal.Round(2).StringFixed(2),
+		GrossTotal: i.GrossTotal.Round(2).StringFixed(2),
+		Currency:   i.Currency,
+	}
 
-	// Create an alias to avoid recursion
-	type Alias StockMovementDocumentTotals
-	return e.EncodeElement((*Alias)(i), start)
+	return e.EncodeElement(temp, start)
 }
 
 // Element
@@ -1705,14 +1725,22 @@ type WorkDocumentDocumentTotals struct {
 }
 
 func (i *WorkDocumentDocumentTotals) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	// Round the monetary values to 2 decimal places
-	i.TaxPayable = SafmonetaryType{i.TaxPayable.Round(2)}
-	i.NetTotal = SafmonetaryType{i.NetTotal.Round(2)}
-	i.GrossTotal = SafmonetaryType{i.GrossTotal.Round(2)}
+	// Create a temporary struct with string values for monetary fields to ensure exactly 2 decimal places
+	temp := struct {
+		XMLName    xml.Name  `xml:"DocumentTotals"`
+		TaxPayable string    `xml:"TaxPayable"`
+		NetTotal   string    `xml:"NetTotal"`
+		GrossTotal string    `xml:"GrossTotal"`
+		Currency   *Currency `xml:"Currency"`
+	}{
+		XMLName:    xml.Name{Local: "DocumentTotals"},
+		TaxPayable: i.TaxPayable.Round(2).StringFixed(2),
+		NetTotal:   i.NetTotal.Round(2).StringFixed(2),
+		GrossTotal: i.GrossTotal.Round(2).StringFixed(2),
+		Currency:   i.Currency,
+	}
 
-	// Create an alias to avoid recursion
-	type Alias WorkDocumentDocumentTotals
-	return e.EncodeElement((*Alias)(i), start)
+	return e.EncodeElement(temp, start)
 }
 
 // Element
@@ -1830,6 +1858,27 @@ type PaymentDocumentTotals struct {
 	Settlement *DocumentTotalsSettlement `xml:"Settlement"`
 
 	Currency *Currency `xml:"Currency"`
+}
+
+func (i *PaymentDocumentTotals) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Create a temporary struct with string values for monetary fields to ensure exactly 2 decimal places
+	temp := struct {
+		XMLName    xml.Name                  `xml:"DocumentTotals"`
+		TaxPayable string                    `xml:"TaxPayable"`
+		NetTotal   string                    `xml:"NetTotal"`
+		GrossTotal string                    `xml:"GrossTotal"`
+		Settlement *DocumentTotalsSettlement `xml:"Settlement"`
+		Currency   *Currency                 `xml:"Currency"`
+	}{
+		XMLName:    xml.Name{Local: "DocumentTotals"},
+		TaxPayable: i.TaxPayable.Round(2).StringFixed(2),
+		NetTotal:   i.NetTotal.Round(2).StringFixed(2),
+		GrossTotal: i.GrossTotal.Round(2).StringFixed(2),
+		Settlement: i.Settlement,
+		Currency:   i.Currency,
+	}
+
+	return e.EncodeElement(temp, start)
 }
 
 // Element
@@ -2123,7 +2172,7 @@ func (s *SafdecimalType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 }
 
 func (s SafdecimalType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	value := s.StringFixed(2)
+	value := s.String()
 	return e.EncodeElement(value, start)
 }
 
@@ -2133,7 +2182,7 @@ type SafmonetaryType struct {
 
 // Convert SafmonetaryType to XML
 func (s SafmonetaryType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	value := s.StringFixed(2)
+	value := s.String()
 	return e.EncodeElement(value, start)
 }
 
