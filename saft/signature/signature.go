@@ -34,7 +34,7 @@ func SignFiscalDocument(r *rsa.PrivateKey, date time.Time, systemDate time.Time,
 	}
 
 	// Sign in this format 2010-05-18;2010-05-18T11:22:19;FAC 001/14;3.12;lastHash
-	message := date.Format("2006-01-02") + ";" + systemDate.Format("2006-01-02T15:04:05") + ";" + invoiceNo + ";" + grossTotal.String() + ";" + lastHash
+	message := date.Format("2006-01-02") + ";" + systemDate.Format("2006-01-02T15:04:05") + ";" + invoiceNo + ";" + grossTotal.StringFixed(2) + ";" + lastHash
 	hashed := crypto.SHA1.New().Sum([]byte(message))
 	signature, err := rsa.SignPKCS1v15(rand.Reader, r, crypto.SHA1, hashed)
 	if err != nil {

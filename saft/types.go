@@ -2123,7 +2123,7 @@ func (s *SafdecimalType) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 }
 
 func (s SafdecimalType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	value := s.String()
+	value := s.StringFixed(2)
 	return e.EncodeElement(value, start)
 }
 
@@ -2133,7 +2133,7 @@ type SafmonetaryType struct {
 
 // Convert SafmonetaryType to XML
 func (s SafmonetaryType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	value := s.String()
+	value := s.StringFixed(2)
 	return e.EncodeElement(value, start)
 }
 
