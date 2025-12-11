@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding/charmap"
 )
 
 //func (a *AuditFile) CheckTypes() (string, error) {
@@ -40,7 +41,14 @@ func (a *AuditFile) ToXML() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return xml.Header + string(out), nil
+
+	encoder := charmap.Windows1252.NewEncoder()
+	outStr, err := encoder.String(string(out))
+	if err != nil {
+		return "", err
+	}
+
+	return `<?xml version="1.0" encoding="Windows-1252"?>` + "\n" + outStr, nil
 }
 
 func FromXML(xmlFile string) (*AuditFile, error) {
