@@ -1390,7 +1390,7 @@ type InvoiceLine struct {
 
 	References []References `xml:"References"`
 
-	Description SafpttextTypeMandatoryMax200Car `xml:"Description"`
+	Description SafpttextTypeMandatoryMax200Car `xml:"Description,omitempty"`
 
 	ProductSerialNumber *ProductSerialNumber `xml:"ProductSerialNumber"`
 
@@ -1542,7 +1542,7 @@ type StockMovementLine struct {
 
 	UnitPrice SafmonetaryType `xml:"UnitPrice"`
 
-	Description SafpttextTypeMandatoryMax200Car `xml:"Description"`
+	Description SafpttextTypeMandatoryMax200Car `xml:"Description,omitempty"`
 
 	ProductSerialNumber *ProductSerialNumber `xml:"ProductSerialNumber"`
 
@@ -1692,7 +1692,7 @@ type WorkDocumentLine struct {
 
 	References []References `xml:"References"`
 
-	Description SafpttextTypeMandatoryMax200Car `xml:"Description"`
+	Description SafpttextTypeMandatoryMax200Car `xml:"Description,omitempty"`
 
 	ProductSerialNumber *ProductSerialNumber `xml:"ProductSerialNumber"`
 
