@@ -128,8 +128,7 @@ type CodValidacaoSerieType string
 
 // RegistarSerieRequest communicates a new document series to AT.
 type RegistarSerieRequest struct {
-	XMLName              xml.Name              `xml:"registarSerie"`
-	ATNS                 string                `xml:"xmlns,attr"`
+	XMLName              xml.Name              `xml:"http://at.gov.pt/ registarSerie"`
 	Serie                SerieType             `xml:"serie"`
 	TipoSerie            TipoSerieType         `xml:"tipoSerie"`
 	ClasseDoc            ClasseDocType         `xml:"classeDoc"`
@@ -142,8 +141,7 @@ type RegistarSerieRequest struct {
 
 // FinalizarSerieRequest marks a series as finalized (no more documents will be issued).
 type FinalizarSerieRequest struct {
-	XMLName             xml.Name              `xml:"finalizarSerie"`
-	ATNS                string                `xml:"xmlns,attr"`
+	XMLName             xml.Name              `xml:"http://at.gov.pt/ finalizarSerie"`
 	Serie               SerieType             `xml:"serie"`
 	ClasseDoc           ClasseDocType         `xml:"classeDoc"`
 	TipoDoc             TipoDocType           `xml:"tipoDoc"`
@@ -154,8 +152,7 @@ type FinalizarSerieRequest struct {
 
 // ConsultarSeriesRequest queries registered series. All fields are optional filters.
 type ConsultarSeriesRequest struct {
-	XMLName           xml.Name               `xml:"consultarSeries"`
-	ATNS              string                 `xml:"xmlns,attr"`
+	XMLName           xml.Name               `xml:"http://at.gov.pt/ consultarSeries"`
 	Serie             *SerieType             `xml:"serie,omitempty"`
 	TipoSerie         *TipoSerieType         `xml:"tipoSerie,omitempty"`
 	ClasseDoc         *ClasseDocType         `xml:"classeDoc,omitempty"`
@@ -169,13 +166,12 @@ type ConsultarSeriesRequest struct {
 
 // AnularSerieRequest cancels a previously registered series (correction of error).
 type AnularSerieRequest struct {
-	XMLName              xml.Name              `xml:"anularSerie"`
-	ATNS                 string                `xml:"xmlns,attr"`
-	Serie                SerieType             `xml:"serie"`
-	ClasseDoc            ClasseDocType         `xml:"classeDoc"`
-	TipoDoc              TipoDocType           `xml:"tipoDoc"`
-	CodValidacaoSerie    CodValidacaoSerieType `xml:"codValidacaoSerie"`
-	Motivo               MotivoType            `xml:"motivo"`
+	XMLName           xml.Name              `xml:"http://at.gov.pt/ anularSerie"`
+	Serie             SerieType             `xml:"serie"`
+	ClasseDoc         ClasseDocType         `xml:"classeDoc"`
+	TipoDoc           TipoDocType           `xml:"tipoDoc"`
+	CodValidacaoSerie CodValidacaoSerieType `xml:"codValidacaoSerie"`
+	Motivo            MotivoType            `xml:"motivo"`
 	// Must be true to confirm awareness that cancellation is only valid
 	// if no documents have been issued with this series.
 	DeclaracaoNaoEmissao bool `xml:"declaracaoNaoEmissao"`

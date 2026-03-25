@@ -42,8 +42,6 @@ const (
 	TestURL = "https://servicos.portaldasfinancas.gov.pt:722/SeriesWSService"
 	// ProdURL is the AT production endpoint for the Series webservice.
 	ProdURL = "https://servicos.portaldasfinancas.gov.pt:422/SeriesWSService"
-
-	atNamespace = "http://at.gov.pt/"
 )
 
 // Client is a SOAP client for the AT Series webservice.
@@ -87,7 +85,6 @@ func NewClient(endpoint, username, password string, clientCert tls.Certificate, 
 // RegistarSerie communicates a new document series to AT and returns the
 // AT-assigned series validation code (codValidacaoSerie) in the response.
 func (c *Client) RegistarSerie(req types.RegistarSerieRequest) (*types.RegistarSerieResponse, error) {
-	req.ATNS = atNamespace
 	var resp types.RegistarSerieResponse
 	if err := c.call(req, &resp); err != nil {
 		return nil, err
@@ -98,7 +95,6 @@ func (c *Client) RegistarSerie(req types.RegistarSerieRequest) (*types.RegistarS
 // FinalizarSerie marks a series as finalized — no more documents will be
 // issued under it beyond the last emitted sequence number.
 func (c *Client) FinalizarSerie(req types.FinalizarSerieRequest) (*types.FinalizarSerieResponse, error) {
-	req.ATNS = atNamespace
 	var resp types.FinalizarSerieResponse
 	if err := c.call(req, &resp); err != nil {
 		return nil, err
@@ -109,7 +105,6 @@ func (c *Client) FinalizarSerie(req types.FinalizarSerieRequest) (*types.Finaliz
 // ConsultarSeries queries registered series. All filter fields in the request
 // are optional; a zero-value request returns all series.
 func (c *Client) ConsultarSeries(req types.ConsultarSeriesRequest) (*types.ConsultarSeriesResponse, error) {
-	req.ATNS = atNamespace
 	var resp types.ConsultarSeriesResponse
 	if err := c.call(req, &resp); err != nil {
 		return nil, err
@@ -121,7 +116,6 @@ func (c *Client) ConsultarSeries(req types.ConsultarSeriesRequest) (*types.Consu
 // req.DeclaracaoNaoEmissao must be true, confirming that no documents have
 // been issued with the series being cancelled.
 func (c *Client) AnularSerie(req types.AnularSerieRequest) (*types.AnularSerieResponse, error) {
-	req.ATNS = atNamespace
 	var resp types.AnularSerieResponse
 	if err := c.call(req, &resp); err != nil {
 		return nil, err
