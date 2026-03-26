@@ -32,19 +32,20 @@ import (
 // Header is the WS-Security SOAP header element.
 // Embed it in a soap:Header struct for SOAP requests.
 type Header struct {
-	XMLName       xml.Name      `xml:"http://schemas.xmlsoap.org/ws/2002/12/secext Security"`
-	UsernameToken UsernameToken `xml:"http://schemas.xmlsoap.org/ws/2002/12/secext UsernameToken"`
+	XMLName       xml.Name      `xml:"wss:Security"`
+	XmlNSWss      string        `xml:"xmlns:wss,attr"`
+	UsernameToken UsernameToken `xml:"wss:UsernameToken"`
 }
 
 // UsernameToken holds the encrypted credentials for a single SOAP call.
 type UsernameToken struct {
-	Username string `xml:"http://schemas.xmlsoap.org/ws/2002/12/secext Username"`
+	Username string `xml:"wss:Username"`
 	// AES-ECB-PKCS5 encrypted password, Base64-encoded.
-	Password string `xml:"http://schemas.xmlsoap.org/ws/2002/12/secext Password"`
+	Password string `xml:"wss:Password"`
 	// RSA-PKCS1v15 encrypted symmetric key (Ks), Base64-encoded.
-	Nonce string `xml:"http://schemas.xmlsoap.org/ws/2002/12/secext Nonce"`
+	Nonce string `xml:"wss:Nonce"`
 	// AES-ECB-PKCS5 encrypted UTC timestamp, Base64-encoded.
-	Created string `xml:"http://schemas.xmlsoap.org/ws/2002/12/secext Created"`
+	Created string `xml:"wss:Created"`
 }
 
 // Build constructs a WS-Security header for a single AT webservice request.
@@ -85,6 +86,7 @@ func Build(username, password string, atPubKey *rsa.PublicKey) (Header, error) {
 	}
 
 	return Header{
+		XmlNSWss: "http://schemas.xmlsoap.org/ws/2002/12/secext",
 		UsernameToken: UsernameToken{
 			Username: username,
 			Password: base64.StdEncoding.EncodeToString(encPassword),
