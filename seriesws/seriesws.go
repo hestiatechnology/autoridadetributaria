@@ -74,7 +74,7 @@ type AnularSerie struct {
 }
 
 type AnularSerieResponse struct {
-	XMLName xml.Name `xml:"at:anularSerieResponse"`
+	XMLName xml.Name `xml:"anularSerieResponse"`
 	XmlNSAt string   `xml:"xmlns:at,attr"`
 
 	AnularSerieResp *SeriesResp `xml:"anularSerieResp,omitempty" json:"anularSerieResp,omitempty"`
@@ -113,7 +113,7 @@ type ConsultarSeries struct {
 }
 
 type ConsultarSeriesResponse struct {
-	XMLName xml.Name `xml:"at:consultarSeriesResponse"`
+	XMLName xml.Name `xml:"consultarSeriesResponse"`
 	XmlNSAt string   `xml:"xmlns:at,attr"`
 
 	ConsultarSeriesResp *ConsultSeriesResp `xml:"consultarSeriesResp,omitempty" json:"consultarSeriesResp,omitempty"`
@@ -143,7 +143,7 @@ type FinalizarSerie struct {
 }
 
 type FinalizarSerieResponse struct {
-	XMLName xml.Name `xml:"at:finalizarSerieResponse"`
+	XMLName xml.Name `xml:"finalizarSerieResponse"`
 	XmlNSAt string   `xml:"xmlns:at,attr"`
 
 	FinalizarSerieResp *SeriesResp `xml:"finalizarSerieResp,omitempty" json:"finalizarSerieResp,omitempty"`
@@ -179,7 +179,7 @@ type RegistarSerie struct {
 }
 
 type RegistarSerieResponse struct {
-	XMLName xml.Name `xml:"at:registarSerieResponse"`
+	XMLName xml.Name `xml:"registarSerieResponse"`
 	XmlNSAt string   `xml:"xmlns:at,attr"`
 
 	RegistarSerieResp *SeriesResp `xml:"registarSerieResp,omitempty" json:"registarSerieResp,omitempty"`
