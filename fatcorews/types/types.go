@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	"encoding/xml"
@@ -850,45 +850,3 @@ type RegisterInvoiceRequest struct {
 	InvoiceData               InvoiceDataType       `xml:"InvoiceData"`
 }
 
-var a = RegisterInvoiceRequest{
-	EFaturaMDVersion:          NewEFaturaMDVersion(),
-	TaxRegistrationNumber:     NewTaxRegistrationNumber(251487547),
-	TaxEntity:                 NewTaxEntity("Teste"),
-	SoftwareCertificateNumber: 123456789,
-	InvoiceData: InvoiceDataType{
-		InvoiceHeaderType: InvoiceHeaderType{
-			InvoiceNo:            NewInvoiceNo("FT A/1"),
-			InvoiceDate:          InvoiceDate(time.Now()),
-			InvoiceType:          InvoiceType(InvoiceFT),
-			SelfBillingIndicator: SelfBillingNo,
-			CustomerTaxID:        NewCustomerTaxID("999999999"),
-			CustomerTaxIDCountry: NewCustomerTaxIDCountry("PT"),
-		},
-		DocumentStatus: InvoiceStatus{
-			InvoiceStatus:     InvoiceNormal,
-			InvoiceStatusDate: InvoiceStatusDate(time.Now()),
-		},
-		HashCharaters:          NewHashCharaters("1234"),
-		CashVATSchemeIndicator: CashVATSchemeNo,
-		WithholdingTax: &[]WithholdingTax{
-			{
-				WithholdingTaxType:   WithholdingTaxIRC,
-				WithholdingTaxAmount: decimal.NewFromFloat(10.0111),
-			},
-			{
-				WithholdingTaxType:   WithholdingTaxIRC,
-				WithholdingTaxAmount: decimal.NewFromFloat(20.0111),
-			},
-		},
-	},
-}
-
-// convert to xml
-func main() {
-	// MarshalIndent is used to format the output
-	output, err := xml.MarshalIndent(a, "", "    ")
-	if err != nil {
-		log.Println("error: ", err)
-	}
-	log.Println(string(output))
-}
