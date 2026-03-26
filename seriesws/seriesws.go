@@ -50,7 +50,8 @@ type NifType string
 type MeioProcessamentoType string
 
 type AnularSerie struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ anularSerie"`
+	XMLName xml.Name `xml:"at:anularSerie"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	// Indique o identificador da Série cuja comunicação pretende anular.
 	Serie *SerieType `xml:"serie,omitempty" json:"serie,omitempty"`
@@ -72,13 +73,15 @@ type AnularSerie struct {
 }
 
 type AnularSerieResponse struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ anularSerieResponse"`
+	XMLName xml.Name `xml:"at:anularSerieResponse"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	AnularSerieResp *SeriesResp `xml:"anularSerieResp,omitempty" json:"anularSerieResp,omitempty"`
 }
 
 type ConsultarSeries struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ consultarSeries"`
+	XMLName xml.Name `xml:"at:consultarSeries"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	// Indique o identificador da Série que pretende consultar.
 	Serie *SerieType `xml:"serie,omitempty" json:"serie,omitempty"`
@@ -109,13 +112,15 @@ type ConsultarSeries struct {
 }
 
 type ConsultarSeriesResponse struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ consultarSeriesResponse"`
+	XMLName xml.Name `xml:"at:consultarSeriesResponse"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	ConsultarSeriesResp *ConsultSeriesResp `xml:"consultarSeriesResp,omitempty" json:"consultarSeriesResp,omitempty"`
 }
 
 type FinalizarSerie struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ finalizarSerie"`
+	XMLName xml.Name `xml:"at:finalizarSerie"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	// Indique o identificador da Série que pretende finalizar.
 	Serie *SerieType `xml:"serie,omitempty" json:"serie,omitempty"`
@@ -137,13 +142,15 @@ type FinalizarSerie struct {
 }
 
 type FinalizarSerieResponse struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ finalizarSerieResponse"`
+	XMLName xml.Name `xml:"at:finalizarSerieResponse"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	FinalizarSerieResp *SeriesResp `xml:"finalizarSerieResp,omitempty" json:"finalizarSerieResp,omitempty"`
 }
 
 type RegistarSerie struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ registarSerie"`
+	XMLName xml.Name `xml:"at:registarSerie"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	// Indique o identificador da Série que pretende comunicar a AT.
 	Serie *SerieType `xml:"serie,omitempty" json:"serie,omitempty"`
@@ -171,13 +178,15 @@ type RegistarSerie struct {
 }
 
 type RegistarSerieResponse struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ registarSerieResponse"`
+	XMLName xml.Name `xml:"at:registarSerieResponse"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	RegistarSerieResp *SeriesResp `xml:"registarSerieResp,omitempty" json:"registarSerieResp,omitempty"`
 }
 
 type SeriesResp struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ seriesResp"`
+	XMLName xml.Name `xml:"at:seriesResp"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	InfoSerie *SeriesInfo `xml:"infoSerie,omitempty" json:"infoSerie,omitempty"`
 
@@ -185,7 +194,8 @@ type SeriesResp struct {
 }
 
 type SeriesInfo struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ seriesInfo"`
+	XMLName xml.Name `xml:"at:seriesInfo"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	// Identificador da Série.
 	Serie *SerieType `xml:"serie,omitempty" json:"serie,omitempty"`
@@ -240,7 +250,8 @@ type SeriesInfo struct {
 }
 
 type OperationResultInfo struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ operationResultInfo"`
+	XMLName xml.Name `xml:"at:operationResultInfo"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	// Código do resultado da operação
 	CodResultOper *CodResultOperType `xml:"codResultOper,omitempty" json:"codResultOper,omitempty"`
@@ -250,7 +261,8 @@ type OperationResultInfo struct {
 }
 
 type ConsultSeriesResp struct {
-	XMLName xml.Name `xml:"http://at.gov.pt/ consultSeriesResp"`
+	XMLName xml.Name `xml:"at:consultSeriesResp"`
+	XmlNSAt string `xml:"xmlns:at,attr"`
 
 	InfoSerie []*SeriesInfo `xml:"infoSerie,omitempty" json:"infoSerie,omitempty"`
 
@@ -302,6 +314,7 @@ func NewSeriesWS(client *soap.Client) SeriesWS {
 }
 
 func (service *seriesWS) RegistarSerieContext(ctx context.Context, request *RegistarSerie) (*RegistarSerieResponse, error) {
+	request.XmlNSAt = "http://at.gov.pt/"
 	response := new(RegistarSerieResponse)
 	err := service.client.CallContext(ctx, "''", request, response)
 	if err != nil {
@@ -319,6 +332,7 @@ func (service *seriesWS) RegistarSerie(request *RegistarSerie) (*RegistarSerieRe
 }
 
 func (service *seriesWS) FinalizarSerieContext(ctx context.Context, request *FinalizarSerie) (*FinalizarSerieResponse, error) {
+	request.XmlNSAt = "http://at.gov.pt/"
 	response := new(FinalizarSerieResponse)
 	err := service.client.CallContext(ctx, "''", request, response)
 	if err != nil {
@@ -336,6 +350,7 @@ func (service *seriesWS) FinalizarSerie(request *FinalizarSerie) (*FinalizarSeri
 }
 
 func (service *seriesWS) ConsultarSeriesContext(ctx context.Context, request *ConsultarSeries) (*ConsultarSeriesResponse, error) {
+	request.XmlNSAt = "http://at.gov.pt/"
 	response := new(ConsultarSeriesResponse)
 	err := service.client.CallContext(ctx, "''", request, response)
 	if err != nil {
@@ -353,6 +368,7 @@ func (service *seriesWS) ConsultarSeries(request *ConsultarSeries) (*ConsultarSe
 }
 
 func (service *seriesWS) AnularSerieContext(ctx context.Context, request *AnularSerie) (*AnularSerieResponse, error) {
+	request.XmlNSAt = "http://at.gov.pt/"
 	response := new(AnularSerieResponse)
 	err := service.client.CallContext(ctx, "''", request, response)
 	if err != nil {

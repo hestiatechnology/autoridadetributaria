@@ -77,6 +77,7 @@ func Example() {
 
 	// Build the request payload
 	req := &seriesws.RegistarSerie{
+		XmlNSAt:              "http://at.gov.pt/",
 		Serie:                &serie,
 		TipoSerie:            &tipoSerie,
 		ClasseDoc:            &classeDoc,
