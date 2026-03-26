@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hestiatechnology/autoridadetributaria/security"
@@ -31,12 +32,25 @@ func Example() {
 		Certificates: []tls.Certificate{clientCert},
 	}
 
+	// Create an underlying HTTP client with the TLS config
+	httpClient := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: tlsConfig,
+		},
+	}
+
+	// Wrap the HTTP client with the LoggingHTTPClient to see the raw SOAP XML
+	loggingClient := &security.LoggingHTTPClient{
+		Client: httpClient,
+		Logger: log.Printf,
+	}
+
 	// 4. Initialize the SOAP client pointing to the AT webservice endpoint
 	// Test env: https://servicos.portaldasfinancas.gov.pt:701/SeriesWSService/SeriesWS
 	// Prod env: https://servicos.portaldasfinancas.gov.pt:401/SeriesWSService/SeriesWS
 	client := soap.NewClient(
 		"https://servicos.portaldasfinancas.gov.pt:701/SeriesWSService/SeriesWS",
-		soap.WithTLS(tlsConfig),
+		soap.WithHTTPClient(loggingClient),
 	)
 
 	// 5. Build and add the WS-Security header
