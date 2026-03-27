@@ -10,11 +10,9 @@ require (
 )
 
 require (
+	github.com/hooklift/gowsdl v0.5.0
 	golang.org/x/crypto v0.38.0
 	golang.org/x/text v0.25.0
 )
 
-require (
-	github.com/enthus-golang/gowsdl v0.1.0 // indirect
-	github.com/hooklift/gowsdl v0.5.0 // indirect
-)
+require github.com/stretchr/testify v1.10.0 // indirect
