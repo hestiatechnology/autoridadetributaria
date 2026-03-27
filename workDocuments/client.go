@@ -132,18 +132,9 @@ func (c *Client) EnvioDocumentoTransporte(username, password string, request *St
 	c.username = username
 	c.password = password
 
-	type wrapper struct {
-		XMLName xml.Name `xml:"ns1:envioDocumentoTransporteRequest"`
-		Ns1     string   `xml:"xmlns:ns1,attr"`
-		*StockMovement
-	}
-
-	req := wrapper{
-		Ns1: "https://servicos.portaldasfinancas.gov.pt/sgdtws/documentosTransporte/",
-		StockMovement: request,
-	}
-
-	respBytes, err := c.call(req)
+	// Pass request directly — StockMovement.XMLName already has the correct element name
+	// and namespace ("envioDocumentoTransporteRequestElem") as defined in the AT WSDL.
+	respBytes, err := c.call(request)
 	if err != nil {
 		return nil, err
 	}
