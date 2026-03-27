@@ -104,6 +104,13 @@ type StockMovement struct {
 
 	MovementType *MovementType `xml:"MovementType,omitempty" json:"MovementType,omitempty"`
 
+	// CustomerTaxID and SupplierTaxID must appear before customer details and Line items.
+	// Exactly one of these must be filled in (AT validation rule).
+	// Note: gowsdl generated these after Line which is wrong — fixed manually.
+	CustomerTaxID *SAFPTtextTypeMandatoryMax20Car `xml:"CustomerTaxID,omitempty" json:"CustomerTaxID,omitempty"`
+
+	SupplierTaxID *SAFPTtextTypeMandatoryMax20Car `xml:"SupplierTaxID,omitempty" json:"SupplierTaxID,omitempty"`
+
 	CustomerAddress *AddressStructurePT `xml:"CustomerAddress,omitempty" json:"CustomerAddress,omitempty"`
 
 	CustomerName *SAFPTtextTypeMandatoryMax100Car `xml:"CustomerName,omitempty" json:"CustomerName,omitempty"`
@@ -119,10 +126,6 @@ type StockMovement struct {
 	VehicleID *SAFPTtextTypeMandatoryMax32Car `xml:"VehicleID,omitempty" json:"VehicleID,omitempty"`
 
 	Line []*Line `xml:"Line,omitempty" json:"Line,omitempty"`
-
-	CustomerTaxID *SAFPTtextTypeMandatoryMax20Car `xml:"CustomerTaxID,omitempty" json:"CustomerTaxID,omitempty"`
-
-	SupplierTaxID *SAFPTtextTypeMandatoryMax20Car `xml:"SupplierTaxID,omitempty" json:"SupplierTaxID,omitempty"`
 }
 
 type StockMovementResponse struct {
