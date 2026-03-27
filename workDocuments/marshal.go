@@ -7,12 +7,12 @@ import (
 )
 
 // Dates
-func (t SAFdateType) MarshalText() ([]byte, error) {
-	return []byte((*soap.XSDDate)(&t).ToGoTime().Format("2006-01-02")), nil
+func (t *SAFdateType) MarshalText() ([]byte, error) {
+	return []byte((*soap.XSDDate)(t).ToGoTime().Format("2006-01-02")), nil
 }
 
-func (t SAFdateTimeType) MarshalText() ([]byte, error) {
-	return []byte((*soap.XSDDateTime)(&t).ToGoTime().Format("2006-01-02T15:04:05")), nil
+func (t *SAFdateTimeType) MarshalText() ([]byte, error) {
+	return []byte((*soap.XSDDateTime)(t).ToGoTime().Format("2006-01-02T15:04:05")), nil
 }
 
 // Decimals
