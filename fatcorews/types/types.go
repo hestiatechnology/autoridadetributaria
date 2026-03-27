@@ -720,6 +720,7 @@ type WorkType WorkTypeType
 type InvoiceHeaderType struct {
 	/* XMLName              xml.Name             `xml:"InvoiceHeaderType"` */
 	InvoiceNo            InvoiceNo            `xml:"doc:InvoiceNo"`
+	ATCUD                ATCUD                `xml:"doc:ATCUD"`
 	InvoiceDate          InvoiceDate          `xml:"doc:InvoiceDate"`
 	InvoiceType          InvoiceType          `xml:"doc:InvoiceType"`
 	SelfBillingIndicator SelfBillingIndicator `xml:"doc:SelfBillingIndicator"`
