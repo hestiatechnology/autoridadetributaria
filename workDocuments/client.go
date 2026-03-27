@@ -84,16 +84,11 @@ func (c *Client) call(requestBody interface{}) ([]byte, error) {
 		return nil, fmt.Errorf("build security header: %w", err)
 	}
 
-	bodyBytes, err := xml.Marshal(requestBody)
-	if err != nil {
-		return nil, fmt.Errorf("marshal request body: %w", err)
-	}
-
 	env := soapEnvelope{
 		Soapenv: "http://schemas.xmlsoap.org/soap/envelope/",
 		Wsse:    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
 		Header:  soapHeader{Security: secHeader},
-		Body:    soapBody{Content: bodyBytes},
+		Body:    soapBody{Content: requestBody},
 	}
 
 	envBytes, err := xml.Marshal(env)
