@@ -101,7 +101,7 @@ func (c *Client) call(requestBody interface{}) ([]byte, error) {
 		return nil, fmt.Errorf("create http request: %w", err)
 	}
 	httpReq.Header.Set("Content-Type", "text/xml; charset=utf-8")
-	httpReq.Header.Set("SOAPAction", "")
+	httpReq.Header.Set("SOAPAction", "https://servicos.portaldasfinancas.gov.pt/sgdtws/documentosTransporte/")
 
 	httpResp, err := c.httpClient.Do(httpReq)
 	if err != nil {
