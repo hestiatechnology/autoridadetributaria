@@ -2,17 +2,17 @@ package workDocuments
 
 import (
 	"encoding/xml"
-	"time"
 	"github.com/shopspring/decimal"
+    "github.com/hooklift/gowsdl/soap"
 )
 
 // Dates
 func (t SAFdateType) MarshalText() ([]byte, error) {
-	return []byte(t.String()), nil
+	return []byte(soap.XSDDate(t).ToGoTime().Format("2006-01-02")), nil
 }
 
 func (t SAFdateTimeType) MarshalText() ([]byte, error) {
-	return []byte(t.String()), nil
+	return []byte(soap.XSDDateTime(t).ToGoTime().Format("2006-01-02T15:04:05")), nil
 }
 
 // Decimals
