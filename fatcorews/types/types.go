@@ -817,7 +817,7 @@ func NewTaxEntity(value string) TaxEntity {
 type InvoiceDataType struct {
 	InvoiceHeaderType
 	DocumentStatus         InvoiceStatus          `xml:"DocumentStatus"`
-	HashCharaters          HashCharaters          `xml:"HashCharaters"`
+	HashCharaters          HashCharaters          `xml:"HashCharacters"`
 	CashVATSchemeIndicator CashVATSchemeIndicator `xml:"CashVATSchemeIndicator"`
 	PaperLessIndicator     PaperLessIndicator     `xml:"PaperLessIndicator"`
 	EACCode                *EACCode               `xml:"EACCode"` // optional
@@ -845,6 +845,7 @@ type LineSummary struct {
 type RegisterInvoiceRequest struct {
 	XMLName                   xml.Name              `xml:"RegisterInvoiceRequest"`
 	EFaturaMDVersion          EFaturaMDVersion      `xml:"eFaturaMDVersion"`
+	AuditFileVersion          AuditFileVersion      `xml:"AuditFileVersion"`
 	TaxRegistrationNumber     TaxRegistrationNumber `xml:"TaxRegistrationNumber"`
 	TaxEntity                 TaxEntity             `xml:"TaxEntity"`
 	SoftwareCertificateNumber uint                  `xml:"SoftwareCertificateNumber"`

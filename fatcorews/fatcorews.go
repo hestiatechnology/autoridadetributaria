@@ -208,6 +208,7 @@ func (c *Client) call(requestBody interface{}) (*Response, error) {
 		return nil, fmt.Errorf("unmarshal soap response: %w", err)
 	}
 	if envelope.Body.Fault != nil {
+		
 		return nil, errors.New(envelope.Body.Fault.FaultString)
 	}
 
