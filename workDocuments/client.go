@@ -121,11 +121,42 @@ func (c *Client) call(requestBody interface{}) ([]byte, error) {
 
 	var envelope soapResponseEnvelope
 	if err := xml.Unmarshal(respBytes, &envelope); err != nil {
+		fmt.Printf("\n=== AT TRANSPORT SOAP FAULT ===\nRequest XML:\n%s\n\nResponse XML:\n%s\n===============================\n\n", string(envBytes), string(respBytes))
 		return nil, fmt.Errorf("unmarshal soap response: %w", err)
 	}
 	if envelope.Body.Fault != nil {
+		fmt.Printf("\n=== AT TRANSPORT SOAP FAULT ===\nRequest XML:\n%s\n\nResponse XML:\n%s\n===============================\n\n", string(envBytes), string(respBytes))
 		return nil, errors.New(envelope.Body.Fault.FaultString)
 	}
 
 	return envelope.Body.Content, nil
+}
+
+func (c *Client) EnvioDocumentoTransporte(username, password string, request *StockMovement) (*StockMovementResponse, error) {
+	// Update credentials for this call
+	c.username = username
+	c.password = password
+
+	type wrapper struct {
+		XMLName xml.Name `xml:"ns1:envioDocumentoTransporteRequest"`
+		Ns1     string   `xml:"xmlns:ns1,attr"`
+		*StockMovement
+	}
+
+	req := wrapper{
+		Ns1: "https://servicos.portaldasfinancas.gov.pt/sgdtws/documentosTransporte/",
+		StockMovement: request,
+	}
+
+	respBytes, err := c.call(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp StockMovementResponse
+	if err := xml.Unmarshal(respBytes, &resp); err != nil {
+		return nil, fmt.Errorf("unmarshal response: %w", err)
+	}
+
+	return &resp, nil
 }
