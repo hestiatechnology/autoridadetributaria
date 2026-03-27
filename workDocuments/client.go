@@ -132,9 +132,21 @@ func (c *Client) EnvioDocumentoTransporte(username, password string, request *St
 	c.username = username
 	c.password = password
 
-	// Pass request directly — StockMovement.XMLName already has the correct element name
-	// and namespace ("envioDocumentoTransporteRequestElem") as defined in the AT WSDL.
-	respBytes, err := c.call(request)
+	// Wrap with a prefixed namespace (ns1:) so child elements are NOT in any namespace.
+	// If we let StockMovement's own XMLName set xmlns="" (default namespace), AT's XSD
+	// parser rejects every child element because the schema has elementFormDefault=unqualified
+	// (children must be namespace-free). Using a prefix keeps the default namespace empty.
+	type wrapper struct {
+		XMLName xml.Name `xml:"ns1:envioDocumentoTransporteRequestElem"`
+		Ns1     string   `xml:"xmlns:ns1,attr"`
+		*StockMovement
+	}
+	req := wrapper{
+		Ns1:           "https://servicos.portaldasfinancas.gov.pt/sgdtws/documentosTransporte/",
+		StockMovement: request,
+	}
+
+	respBytes, err := c.call(req)
 	if err != nil {
 		return nil, err
 	}
